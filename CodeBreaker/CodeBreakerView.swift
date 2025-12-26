@@ -22,8 +22,6 @@ struct CodeBreakerView: View {
                         view(for: game.attempts[index])
                     }
                 }
-                
-                
             }
             .navigationTitle("CodeBreaker")
             .padding()
