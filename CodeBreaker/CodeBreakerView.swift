@@ -12,7 +12,7 @@ struct CodeBreakerView: View {
     
     var body: some View {
         VStack {
-//            view(for: game.masterCode)
+            view(for: game.masterCode)
             
             view(for: game.guess)
             
