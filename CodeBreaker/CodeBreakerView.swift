@@ -8,34 +8,24 @@
 import SwiftUI
 
 struct CodeBreakerView: View {
-    @State var game = CodeBreaker(pegChoices: [.brown, .yellow, .orange, .black])
+    @State var game = CodeBreaker(pegChoices: [.brown, .yellow, .orange, .primary])
     
     var body: some View {
         NavigationStack {
             VStack {
                 view(for: game.masterCode)
                 
-                view(for: game.guess)
-                
                 ScrollView {
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
                         view(for: game.attempts[index])
                     }
                 }
+            
+                view(for: game.guess)
             }
             .navigationTitle("CodeBreaker")
             .padding()
         }
-    }
-    
-    var guessButton: some View {
-        Button("Guess") {
-            withAnimation {
-                game.attemptGuess()
-            }
-        }
-        .font(.system(size: 80))
-        .minimumScaleFactor(0.1)
     }
     
     func view(for code: Code) -> some View {
@@ -43,7 +33,7 @@ struct CodeBreakerView: View {
             ForEach(code.pegs.indices , id: \.self) { index in
                 RoundedRectangle(cornerRadius: 10)
                     .overlay {
-                        if code.pegs[index] == Code.missing {
+                        if code.pegs[index] == Code.missingPeg {
                             RoundedRectangle(cornerRadius: 10)
                                 .strokeBorder(Color.gray)
                         }
@@ -58,13 +48,24 @@ struct CodeBreakerView: View {
                     }
             }
             
-            MatchMarkers(matches: code.matches)
-                .overlay {
-                    if code.kind == .guess {
-                        guessButton
-                    }
+            if let matches = code.matches {
+                MatchMarkers(matches: matches)
+            } else {
+                if code.kind == .guess {
+                    guessButton
                 }
+            }
         }
+    }
+    
+    var guessButton: some View {
+        Button("Guess") {
+            withAnimation {
+                game.attemptGuess()
+            }
+        }
+        .font(.system(size: 80))
+        .minimumScaleFactor(0.1)
     }
 }
 
