@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CodeBreakerView: View {
     // MARK: Data Owned by Me
-    @State private var game = CodeBreaker(pegChoices: [.green, .yellow, .orange, .blue, .red])
+    @State private var game = CodeBreaker(pegChoices: [.red, .green, .blue, .cyan])
     @State private var selection: Int = 0
     
     // MARK: - Body
@@ -17,15 +17,26 @@ struct CodeBreakerView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                view(for: game.masterCode)
+                CodeView(code: game.masterCode) {
+                    if game.isOver {
+                        resetButton
+                    }
+                }
                 
                 ScrollView {
                     if !game.isOver {
-                        view(for: game.guess)
+                        CodeView(code: game.guess, selection: $selection) {
+                            guessButton
+                        }
                     }
                     
                     ForEach(game.attempts.indices.reversed(), id: \.self) { index in
-                        view(for: game.attempts[index])
+                        CodeView(code: game.attempts[index]) {
+                                if let matches = game.attempts[index].matches {
+                                    MatchMarkers(matches: matches)
+                                }
+                            }
+                        .transition(.asymmetric(insertion: .scale(scale: 4), removal: .identity))
                     }
                 }
                 
@@ -36,28 +47,7 @@ struct CodeBreakerView: View {
             }
             .navigationTitle("CodeBreaker")
             .navigationBarTitleDisplayMode(.inline)
-            .padding()
-        }
-    }
-    
-    func view(for code: Code) -> some View {
-        HStack {
-            CodeView(code: code, selection: $selection)
-            
-            RoundedRectangle(cornerRadius: 16)
-                .foregroundStyle(.clear)
-                .aspectRatio(1, contentMode: .fit)
-                .overlay {
-                    if let matches = code.matches {
-                        MatchMarkers(matches: matches)
-                    } else {
-                        if code.kind == .guess {
-                            guessButton
-                        } else if game.isOver {
-                            resetButton
-                        }
-                    }
-                }
+            .padding(.horizontal)
         }
     }
     

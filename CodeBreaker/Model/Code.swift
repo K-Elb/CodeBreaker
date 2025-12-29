@@ -14,11 +14,18 @@ struct Code {
     
     static let missingPeg: Peg = .clear
     
-    enum Kind: Equatable {
-        case master(isHidden: Bool)
-        case guess
-        case attempt([Match])
-        case unkown
+    var isHidden: Bool {
+        switch kind {
+        case .master(let isHidden): return isHidden
+        default: return false
+        }
+    }
+    
+    var matches: [Match]? {
+        switch kind {
+        case .attempt(let matches): return matches
+        default: return nil
+        }
     }
     
     mutating func randomise(from pegChoices: [Peg]) {
@@ -27,22 +34,8 @@ struct Code {
         }
     }
     
-    var isHidden: Bool {
-        switch kind {
-        case .master(let isHidden): return isHidden
-        default: return false
-        }
-    }
-    
     mutating func reset() {
         pegs = Array(repeating: Code.missingPeg, count: 4)
-    }
-    
-    var matches: [Match]? {
-        switch kind {
-        case .attempt(let matches): return matches
-        default: return nil
-        }
     }
     
     func match(against otherCode: Code) -> [Match] {
@@ -67,5 +60,12 @@ struct Code {
                 return exactMatches[index]
             }
         }
+    }
+    
+    enum Kind: Equatable {
+        case master(isHidden: Bool)
+        case guess
+        case attempt([Match])
+        case unkown
     }
 }

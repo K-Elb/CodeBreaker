@@ -7,15 +7,13 @@
 
 import SwiftUI
 
-typealias Peg = Color
-
 struct CodeBreaker {
     var masterCode: Code = Code(kind: .master(isHidden: true))
     var guess: Code = Code(kind: .guess)
     var attempts: [Code] = []
     let pegChoices: [Peg]
     
-    init(pegChoices : [Peg] = [.green, .yellow, .orange, .blue]) {
+    init(pegChoices : [Peg] = [.red, .blue, .green, .cyan]) {
         self.pegChoices = pegChoices
         randomiseMasterCode()
     }

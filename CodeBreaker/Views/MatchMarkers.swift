@@ -31,6 +31,7 @@ struct MatchMarkers: View {
                 matchMarker(peg: 3)
             }
         }
+        .padding(4)
     }
     
     func matchMarker(peg: Int) -> some View {
