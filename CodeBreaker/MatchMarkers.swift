@@ -14,7 +14,11 @@ enum Match {
 }
 
 struct MatchMarkers: View {
-    var matches: [Match]
+    // MARK: Data In
+    let matches: [Match]
+    
+    
+    // MARK: - Body
     
     var body: some View {
         HStack {
@@ -31,7 +35,7 @@ struct MatchMarkers: View {
     
     func matchMarker(peg: Int) -> some View {
         let exactCount = matches.count { $0 == .exact }
-        let foundCount = matches.count { $0 == .nomatch }
+        let foundCount = matches.count { $0 != .nomatch }
         return Circle()
             .fill(exactCount > peg ? Color.primary : Color.clear)
             .strokeBorder(foundCount > peg ? Color.primary : Color.clear, lineWidth: 2)
