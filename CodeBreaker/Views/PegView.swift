@@ -23,10 +23,10 @@ struct PegView: View {
                     .font(.title2)
                     .foregroundStyle(peg.color.gradient)
                 
-                if peg == Code.missingPeg {
-                    pegShape
-                        .strokeBorder(Color.gray)
-                }
+//                if peg == Code.missingPeg {
+//                    pegShape
+//                        .strokeBorder(Color.gray)
+//                }
             }
             .contentShape(pegShape)
             .aspectRatio(1, contentMode: .fit)

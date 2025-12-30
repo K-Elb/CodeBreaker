@@ -15,14 +15,14 @@ struct CodeBreaker {
     
     init(pegChoices : [Peg] = [.red, .blue, .green, .cyan]) {
         self.pegChoices = pegChoices
-        randomiseMasterCode()
+        masterCode.randomise(from: pegChoices)
     }
     
-    mutating func randomiseMasterCode() {
-        attempts = []
-        masterCode.randomise(from: pegChoices)
+    mutating func restart() {
         masterCode.kind = .master(isHidden: true)
-        print(masterCode)
+        masterCode.randomise(from: pegChoices)
+        guess.reset()
+        attempts.removeAll()
     }
     
     var isOver: Bool {
