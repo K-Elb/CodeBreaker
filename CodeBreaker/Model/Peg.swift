@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum Peg {
-    case clear, red, blue, green, cyan, orange
+    case clear, red, blue, green, cyan, orange, yellow, mint, pink, purple
     
     var color: Color {
         switch self {
@@ -17,6 +17,10 @@ enum Peg {
         case .green: return .green
         case .cyan: return .cyan
         case .orange: return .orange
+        case .yellow: return .yellow
+        case .mint: return .mint
+        case .pink: return .pink
+        case .purple: return .purple
         default : return .clear
         }
     }
@@ -25,10 +29,21 @@ enum Peg {
         switch self {
         case .red: return "heart.fill"
         case .blue: return "drop.fill"
-        case .green: return "leaf.fill"
+        case .green: return "tree.fill"
         case .cyan: return "bolt.fill"
         case .orange: return "flame.fill"
-        default: return ""
+        case .yellow: return "sun.max.fill"
+        case .mint: return "leaf.fill"
+        case .pink: return "brain.fill"
+        case .purple: return "sparkles"
+        default: return "circle"
         }
     }
 }
+
+//extension Peg: Identifiable, Hashable, Equatable {
+//    
+//    func hash(into hasher: inout Hasher) {
+//        hasher.combine(id)
+//    }
+//}

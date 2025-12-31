@@ -28,6 +28,13 @@ struct Code {
         }
     }
     
+    enum Kind: Equatable {
+        case master(isHidden: Bool)
+        case guess
+        case attempt([Match])
+        case unkown
+    }
+    
     mutating func randomise(from pegChoices: [Peg]) {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
@@ -61,12 +68,5 @@ struct Code {
                 return exactMatches[index]
             }
         }
-    }
-    
-    enum Kind: Equatable {
-        case master(isHidden: Bool)
-        case guess
-        case attempt([Match])
-        case unkown
     }
 }
