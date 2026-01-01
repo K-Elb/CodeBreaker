@@ -19,7 +19,11 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     // MARK: Data Owned by Me
     @Namespace private var selectionNameSpace
     
-    init(code: Code, selection: Binding<Int> = .constant(-1), @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() }) {
+    init(
+        code: Code,
+        selection: Binding<Int> = .constant(-1),
+        @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() }
+    ) {
         self.code = code
         self._selection = selection
         self.ancillaryView = ancillaryView
@@ -58,7 +62,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     }
             }
             
-            RoundedRectangle(cornerRadius: 16)
+            Circle()
                 .foregroundStyle(.clear)
                 .aspectRatio(1, contentMode: .fit)
                 .overlay {

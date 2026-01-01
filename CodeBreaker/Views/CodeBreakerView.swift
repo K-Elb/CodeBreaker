@@ -19,47 +19,45 @@ struct CodeBreakerView: View {
     // MARK: - Body
     
     var body: some View {
-        NavigationStack {
-            VStack {
-                CodeView(code: game.masterCode)
-                
-                ScrollView {
-                    if !game.isOver {
-                        CodeView(code: game.guess, selection: $selection) {
-                            Button("Guess", action: guess)
-                                .flexibleSystemFont()
-                        }
-                        .animation(nil, value: game.attempts.count)
-                        .opacity(restarting ? 0 : 1)
+        VStack {
+            CodeView(code: game.masterCode)
+            
+            ScrollView {
+                if !game.isOver {
+                    CodeView(code: game.guess, selection: $selection) {
+                        Button("Guess", action: guess)
+                            .flexibleSystemFont()
                     }
-                    
-                    ForEach(game.attempts, id: \.pegs) { attempt in
-                        CodeView(code: attempt) {
-                            let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
-                            if showMarkers, let matches = attempt.matches {
-                                MatchMarkers(matches: matches)
-                            }
-                        }
-                        .transition(AnyTransition.attempt(game.isOver))
-                    }
+                    .animation(nil, value: game.attempts.count)
+                    .opacity(restarting ? 0 : 1)
                 }
                 
-                if !game.isOver {
-                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                        .transition(.pegChooser)
+                ForEach(game.attempts, id: \.pegs) { attempt in
+                    CodeView(code: attempt) {
+                        let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
+                        if showMarkers, let matches = attempt.matches {
+                            MatchMarkers(matches: matches)
+                        }
+                    }
+                    .transition(.attempt(game.isOver))
                 }
             }
-            .padding(.horizontal)
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Restart", systemImage: "arrow.circlepath", action: restart)
-                }
-                
-                ToolbarItem {
-                    ElapsedTime(startTime: game.startTime, endTime: game.endTime)
-                        .monospaced()
-                        .lineLimit(1)
-                }
+            
+            if !game.isOver {
+                PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                    .transition(.pegChooser)
+            }
+        }
+        .padding(.horizontal)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button("Restart", systemImage: "arrow.circlepath", action: restart)
+            }
+            
+            ToolbarItem {
+                ElapsedTime(startTime: game.startTime, endTime: game.endTime)
+                    .monospaced()
+                    .lineLimit(1)
             }
         }
     }

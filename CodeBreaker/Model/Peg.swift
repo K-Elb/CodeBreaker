@@ -40,10 +40,3 @@ enum Peg {
         }
     }
 }
-
-//extension Peg: Identifiable, Hashable, Equatable {
-//    
-//    func hash(into hasher: inout Hasher) {
-//        hasher.combine(id)
-//    }
-//}
