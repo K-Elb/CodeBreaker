@@ -13,11 +13,12 @@ class CodeBreaker {
     var name: String
     @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
     @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
-    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
     var pegChoices: [Peg.RawValue]
-    @Transient var startTime: Date?
+    @Transient var startTime: Date? // doesn't change UI
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
+    var lastAttemptDate: Date? = Date.now
     
     init(name: String = "Code Breaker", pegChoices : [Peg.RawValue]) {
         self.name = name
@@ -25,9 +26,15 @@ class CodeBreaker {
         masterCode.randomise(from: pegChoices)
     }
     
+    var attempts: [Code] {
+        get { _attempts.sorted {$0.timestamp > $1.timestamp} }
+        set { _attempts = newValue }
+    }
+    
     func startTimer() {
         if startTime == nil, !isOver {
             startTime = .now
+            elapsedTime += 0.0000042
         }
     }
     
@@ -57,6 +64,7 @@ class CodeBreaker {
         guard !attempts.contains(where: { $0.pegs == guess.pegs }) else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
+        lastAttemptDate = Date.now
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)

@@ -131,7 +131,7 @@ struct ElapsedTimeTracker: ViewModifier {
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     @Previewable @State var game = CodeBreaker(name: "", pegChoices: ["blue", "red", "yellow", "green"])
     CodeBreakerView(game: game)
 }

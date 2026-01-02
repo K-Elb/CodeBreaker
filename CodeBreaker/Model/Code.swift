@@ -13,18 +13,19 @@ import SwiftData
 class Code {
     var _kind: String = Kind.unknown.description
     var pegs: [Peg.RawValue]
+    var timestamp = Date.now
     
     var kind: Kind {
         get { return Kind(_kind) }
         set { _kind = newValue.description }
     }
     
-    init(kind: Kind, pegs: [Peg.RawValue] = Array(repeating: "none", count: 4)) {
+    init(kind: Kind, pegs: [Peg.RawValue] = Array(repeating: Code.missingPeg, count: 4)) {
         self.pegs = pegs
         self.kind = kind
     }
     
-    static let missingPeg: Peg = .none
+    static let missingPeg: Peg.RawValue = "clear"
     
     var isHidden: Bool {
         switch kind {
@@ -48,7 +49,7 @@ class Code {
     }
     
     func reset() {
-        pegs = Array(repeating: Code.missingPeg.rawValue, count: 4)
+        pegs = Array(repeating: Code.missingPeg, count: 4)
     }
     
     func match(against otherCode: Code) -> [Match] {

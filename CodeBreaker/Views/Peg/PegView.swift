@@ -11,7 +11,6 @@ struct PegView: View {
     // MARK: Data In
     let peg: Peg.RawValue
     
-    
     // MARK: - Body
     
     let pegShape = Circle()

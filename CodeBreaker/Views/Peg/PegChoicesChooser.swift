@@ -31,7 +31,7 @@ struct PegChoicesChooser: View {
     
     @ViewBuilder
     func button(_ peg: Peg) -> some View {
-        if peg != .none {
+        if peg != .clear {
             PegView(peg: peg.rawValue)
                 .padding(4)
                 .background {

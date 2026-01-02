@@ -6,14 +6,42 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct GameList: View {
+    // MARK: Data In
+    @Environment(\.modelContext) var modelContext
+    
     // MARK: Data Shared with Me
     @Binding var selection: CodeBreaker?
+    @Query private var games: [CodeBreaker]
     
     // MARK: Data Owned by Me
-    @State private var games: [CodeBreaker] = []
     @State private var gameToEdit: CodeBreaker?
+    
+    init(sortBy: SortOption = .name, nameContains search: String = "", selection: Binding<CodeBreaker?>) {
+        _selection = selection
+        let loweraseSearch = search.lowercased()
+        let uppercaseSearch = search.uppercased()
+        let predicate = #Predicate<CodeBreaker> { game in
+            search.isEmpty || game.name.contains(loweraseSearch) || game.name.contains(uppercaseSearch)
+        }
+        switch sortBy {
+        case .name: _games = Query(filter: predicate, sort: \CodeBreaker.name, order: .forward)
+        case .recent: _games = Query(filter: predicate, sort: \CodeBreaker.lastAttemptDate, order: .reverse)
+        }
+    }
+    
+    enum SortOption: CaseIterable {
+        case name, recent
+        
+        var title: String {
+            switch self {
+            case .name: "Sort by Name"
+            case .recent: "Recent"
+            }
+        }
+    }
     
     var body: some View {
         List(selection: $selection) {
@@ -22,19 +50,21 @@ struct GameList: View {
                     GameSummary(game: game)
                 }
                 .contextMenu {
-                    editButton(for: game) // editing a game
+//                    editButton(for: game) // editing a game
                     deleteButton(for: game)
                 }
-                .swipeActions(edge: .leading) {
-                    editButton(for: game).tint(.accentColor) // editing a game
-                }
+//                .swipeActions(edge: .leading) {
+//                    editButton(for: game).tint(.accentColor) // editing a game
+//                }
             }
             .onDelete { offsets in
-                games.remove(atOffsets: offsets)
+                for offset in offsets {
+                    modelContext.delete(games[offset])
+                }
             }
-            .onMove { offsets, destination in
-                games.move(fromOffsets: offsets, toOffset: destination)
-            }
+//            .onMove { offsets, destination in
+//                games.move(fromOffsets: offsets, toOffset: destination)
+//            }
         }
         .onChange(of: games) {
             if let selection, !games.contains(selection) {
@@ -49,11 +79,11 @@ struct GameList: View {
         .onAppear { addSampleGames() }
     }
     
-    func editButton(for game: CodeBreaker) -> some View {
-        Button("Edit", systemImage: "pencil") {
-            gameToEdit = game
-        }
-    }
+//    func editButton(for game: CodeBreaker) -> some View {
+//        Button("Edit", systemImage: "pencil") {
+//            gameToEdit = game
+//        }
+//    }
     
     var addButton: some View {
         Button("Add Game", systemImage: "plus") {
@@ -69,11 +99,10 @@ struct GameList: View {
         if let gameToEdit {
             let copyOfGameToEdit = CodeBreaker(name: gameToEdit.name, pegChoices: gameToEdit.pegChoices)
             GameEditor(game: copyOfGameToEdit) {
-                if let index = games.firstIndex(of: gameToEdit) {
-                    games[index] = copyOfGameToEdit
-                } else {
-                    games.insert(copyOfGameToEdit, at: 0) // bug fixed post-L12
+                if games.contains(gameToEdit) {
+                    modelContext.delete(gameToEdit)
                 }
+                modelContext.insert(copyOfGameToEdit)
             }
         }
     }
@@ -92,22 +121,22 @@ struct GameList: View {
     func deleteButton(for game: CodeBreaker) -> some View {
         Button("Delete", systemImage: "minus.circle", role: .destructive) {
             withAnimation {
-                games.removeAll { $0 == game }
+                modelContext.delete(game)
+
             }
         }
     }
     
     func addSampleGames() {
         if games.isEmpty {
-            games.append(CodeBreaker(name: "Mastermind", pegChoices: ["blue", "red", "yellow", "green"]))
-            games.append(CodeBreaker(name: "Mastermind (Hard)", pegChoices: ["blue", "red", "yellow", "green", "cyan", "purple"]))
-            games.append(CodeBreaker(name: "Pastel", pegChoices: ["cyan", "mint", "pink", "purple"]))
-            selection = games[Int.random(in: 0..<games.count)]
+            modelContext.insert(CodeBreaker(name: "RGB", pegChoices: ["red", "green", "blue"]))
+            modelContext.insert(CodeBreaker(name: "Mastermind", pegChoices: ["blue", "red", "yellow", "green", "cyan", "purple"]))
+            modelContext.insert(CodeBreaker(name: "Pastel", pegChoices: ["cyan", "mint", "pink", "purple"]))
         }
     }
 }
 
-#Preview {
+#Preview(traits: .swiftData) {
     @Previewable @State var selection: CodeBreaker?
     NavigationStack {
         GameList(selection: $selection)
