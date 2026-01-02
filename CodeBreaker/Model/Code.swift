@@ -6,11 +6,23 @@
 //
 
 
-import SwiftUI
+import Foundation
+import SwiftData
 
-struct Code {
-    var kind: Kind
-    var pegs: [Peg] = Array(repeating: Code.missingPeg, count: 4)
+@Model
+class Code {
+    var _kind: String = Kind.unknown.description
+    var pegs: [Peg]
+    
+    var kind: Kind {
+        get { return Kind(_kind) }
+        set { _kind = newValue.description }
+    }
+    
+    init(kind: Kind, pegs: [Peg] = Array(repeating: Code.missingPeg, count: 4)) {
+        self.kind = kind
+        self.pegs = pegs
+    }
     
     static let missingPeg: Peg = .clear
     
@@ -28,21 +40,14 @@ struct Code {
         }
     }
     
-    enum Kind: Equatable {
-        case master(isHidden: Bool)
-        case guess
-        case attempt([Match])
-        case unkown
-    }
-    
-    mutating func randomise(from pegChoices: [Peg]) {
+    func randomise(from pegChoices: [Peg]) {
         for index in pegs.indices {
             pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
         }
         print(self.pegs)
     }
     
-    mutating func reset() {
+    func reset() {
         pegs = Array(repeating: Code.missingPeg, count: 4)
     }
     
@@ -69,4 +74,10 @@ struct Code {
             }
         }
     }
+}
+
+enum Match: String {
+    case nomatch
+    case exact
+    case inexact
 }

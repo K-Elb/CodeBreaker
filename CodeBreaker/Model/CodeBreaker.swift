@@ -5,22 +5,44 @@
 //  Created by Karim Elbehiri on 26/12/2025.
 //
 
-import SwiftUI
+import Foundation
+import SwiftData
 
-@Observable
+extension CodeBreaker {
+    convenience init(name: String = "Code Breaker", pegChoices : [Peg], isNewGame: Bool = true) {
+        self.init()
+    }
+}
+
+@Model
 class CodeBreaker {
     var name: String
-    var masterCode: Code = Code(kind: .master(isHidden: true))
-    var guess: Code = Code(kind: .guess)
-    var attempts: [Code] = []
-    let pegChoices: [Peg]
-    var startTime: Date = .now
+    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
+    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
+    @Relationship(deleteRule: .cascade) var attempts: [Code] = []
+    var pegChoices: [Peg]
+    @Transient var startTime: Date?
     var endTime: Date?
+    var elapsedTime: TimeInterval = 0
     
-    init(name: String = "Code Breaker", pegChoices : [Peg] = [.red, .blue, .green, .cyan]) {
+    init(name: String = "Code Breaker", pegChoices : [Peg]) {
         self.name = name
         self.pegChoices = pegChoices
         masterCode.randomise(from: pegChoices)
+    }
+    
+    func startTimer() {
+        if startTime == nil, !isOver {
+            startTime = .now
+        }
+    }
+    
+    func pauseTimer() {
+        if let startTime {
+            elapsedTime += Date.now.timeIntervalSince(startTime)
+        }
+        
+        startTime = nil
     }
     
     func restart() {
@@ -30,6 +52,7 @@ class CodeBreaker {
         attempts.removeAll()
         startTime = .now
         endTime = nil
+        elapsedTime = 0
     }
     
     var isOver: Bool {
@@ -38,28 +61,18 @@ class CodeBreaker {
     
     func attemptGuess() {
         guard !attempts.contains(where: { $0.pegs == guess.pegs }) else { return }
-        var attempt = guess
-        attempt.kind = .attempt(guess.match(against: masterCode))
+        let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         guess.reset()
         if isOver {
             masterCode.kind = .master(isHidden: false)
             endTime = .now
+            pauseTimer()
         }
     }
     
     func setGuessPeg(_ peg: Peg, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
-    }
-}
-
-extension CodeBreaker: Identifiable, Hashable, Equatable {
-    static func == (lhs: CodeBreaker, rhs: CodeBreaker) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
 }
