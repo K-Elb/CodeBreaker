@@ -12,19 +12,19 @@ import SwiftData
 @Model
 class Code {
     var _kind: String = Kind.unknown.description
-    var pegs: [Peg]
+    var pegs: [Peg.RawValue]
     
     var kind: Kind {
         get { return Kind(_kind) }
         set { _kind = newValue.description }
     }
     
-    init(kind: Kind, pegs: [Peg] = Array(repeating: Code.missingPeg, count: 4)) {
-        self.kind = kind
+    init(kind: Kind, pegs: [Peg.RawValue] = Array(repeating: "none", count: 4)) {
         self.pegs = pegs
+        self.kind = kind
     }
     
-    static let missingPeg: Peg = .clear
+    static let missingPeg: Peg = .none
     
     var isHidden: Bool {
         switch kind {
@@ -40,15 +40,15 @@ class Code {
         }
     }
     
-    func randomise(from pegChoices: [Peg]) {
+    func randomise(from pegChoices: [Peg.RawValue]) {
         for index in pegs.indices {
-            pegs[index] = pegChoices.randomElement() ?? Code.missingPeg
+            pegs[index] = pegChoices.randomElement() ?? ""
         }
         print(self.pegs)
     }
     
     func reset() {
-        pegs = Array(repeating: Code.missingPeg, count: 4)
+        pegs = Array(repeating: Code.missingPeg.rawValue, count: 4)
     }
     
     func match(against otherCode: Code) -> [Match] {

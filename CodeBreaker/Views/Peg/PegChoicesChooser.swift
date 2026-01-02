@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PegChoicesChooser: View {
     // MARK: Data Shared with Me
-    @Binding var pegChoices: [Peg]
+    @Binding var pegChoices: [Peg.RawValue]
     
     var body: some View {
         List {
@@ -22,21 +22,21 @@ struct PegChoicesChooser: View {
     }
     
     func selectPeg(_ peg: Peg) {
-        if pegChoices.contains(where: { $0 == peg }) {
-            pegChoices.removeAll(where: { $0 == peg })
+        if pegChoices.contains(where: { $0 == peg.rawValue }) {
+            pegChoices.removeAll(where: { $0 == peg.rawValue })
         } else {
-            pegChoices.append(peg)
+            pegChoices.append(peg.rawValue)
         }
     }
     
     @ViewBuilder
     func button(_ peg: Peg) -> some View {
-        if peg != .clear {
-            PegView(peg: peg)
+        if peg != .none {
+            PegView(peg: peg.rawValue)
                 .padding(4)
                 .background {
                     Circle()
-                        .foregroundStyle(pegChoices.contains(where: { $0 == peg }) ? Color.gray(0.8) : .clear)
+                        .foregroundStyle(pegChoices.contains(where: { $0 == peg.rawValue }) ? Color.gray(0.8) : .clear)
                 }
                 .onTapGesture {
                     selectPeg(peg)
@@ -46,7 +46,7 @@ struct PegChoicesChooser: View {
 }
 
 #Preview {
-    @Previewable @State var pegChoices: [Peg] = [.green,.orange]
+    @Previewable @State var pegChoices: [Peg.RawValue] = ["green", "orange"]
     PegChoicesChooser(pegChoices: $pegChoices)
         .onChange(of: pegChoices) {
             print("pegChoices = \(pegChoices)")

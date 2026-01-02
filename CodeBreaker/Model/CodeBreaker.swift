@@ -8,24 +8,18 @@
 import Foundation
 import SwiftData
 
-extension CodeBreaker {
-    convenience init(name: String = "Code Breaker", pegChoices : [Peg], isNewGame: Bool = true) {
-        self.init()
-    }
-}
-
 @Model
 class CodeBreaker {
     var name: String
     @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
     @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
     @Relationship(deleteRule: .cascade) var attempts: [Code] = []
-    var pegChoices: [Peg]
+    var pegChoices: [Peg.RawValue]
     @Transient var startTime: Date?
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
     
-    init(name: String = "Code Breaker", pegChoices : [Peg]) {
+    init(name: String = "Code Breaker", pegChoices : [Peg.RawValue]) {
         self.name = name
         self.pegChoices = pegChoices
         masterCode.randomise(from: pegChoices)
@@ -71,7 +65,7 @@ class CodeBreaker {
         }
     }
     
-    func setGuessPeg(_ peg: Peg, at index: Int) {
+    func setGuessPeg(_ peg: Peg.RawValue, at index: Int) {
         guard guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }

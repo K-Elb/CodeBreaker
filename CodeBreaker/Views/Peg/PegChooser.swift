@@ -9,10 +9,10 @@ import SwiftUI
 
 struct PegChooser: View {
     // MARK: Data In
-    let choices: [Peg]
+    let choices: [Peg.RawValue]
     
     // MARK: Data Out
-    var onChoose: ((Peg) -> Void)?
+    var onChoose: ((Peg.RawValue) -> Void)?
     
     // MARK: - Body
     

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PegView: View {
     // MARK: Data In
-    let peg: Peg
+    let peg: Peg.RawValue
     
     
     // MARK: - Body
@@ -17,23 +17,20 @@ struct PegView: View {
     let pegShape = Circle()
     
     var body: some View {
-        pegShape
-            .overlay {
-                Image(systemName: peg.symbol)
-                    .font(.title2)
-                    .foregroundStyle(peg.color.gradient)
-                
-//                if peg == Code.missingPeg {
-//                    pegShape
-//                        .strokeBorder(Color.gray)
-//                }
-            }
-            .contentShape(pegShape)
-            .aspectRatio(1, contentMode: .fit)
-            .foregroundStyle(peg.color.opacity(0.2))
+        if let peg = Peg(rawValue: peg) {
+            pegShape
+                .overlay {
+                    Image(systemName: peg.symbol)
+                        .font(.title2)
+                        .foregroundStyle(peg.color.gradient)
+                }
+                .contentShape(pegShape)
+                .aspectRatio(1, contentMode: .fit)
+                .foregroundStyle(peg.color.opacity(0.2))
+        }
     }
 }
 
 #Preview {
-    PegView(peg: .blue)
+    PegView(peg: "blue")
 }

@@ -68,7 +68,7 @@ struct CodeBreakerView: View {
         }
     }
     
-    func changePegAtSelection(to peg: Peg) {
+    func changePegAtSelection(to peg: Peg.RawValue) {
         game.setGuessPeg(peg, at: selection)
         selection = (selection + 1) % game.masterCode.pegs.count
     }
@@ -132,6 +132,6 @@ struct ElapsedTimeTracker: ViewModifier {
 }
 
 #Preview {
-    @Previewable @State var game = CodeBreaker(name: "", pegChoices: [.blue, .red, .yellow, .green])
+    @Previewable @State var game = CodeBreaker(name: "", pegChoices: ["blue", "red", "yellow", "green"])
     CodeBreakerView(game: game)
 }
