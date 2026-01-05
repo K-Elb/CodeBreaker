@@ -23,31 +23,40 @@ struct GameList: View {
         _selection = selection
         let loweraseSearch = search.lowercased()
         let uppercaseSearch = search.uppercased()
+        let completedOnly = sortBy == .completed
         let predicate = #Predicate<CodeBreaker> { game in
-            search.isEmpty || game.name.contains(loweraseSearch) || game.name.contains(uppercaseSearch)
+            (!completedOnly || game.isOver) &&
+            (search.isEmpty || game.name.contains(loweraseSearch) || game.name.contains(uppercaseSearch))
         }
         switch sortBy {
         case .name: _games = Query(filter: predicate, sort: \CodeBreaker.name, order: .forward)
-        case .recent: _games = Query(filter: predicate, sort: \CodeBreaker.lastAttemptDate, order: .reverse)
+        case .recent, .completed: _games = Query(filter: predicate, sort: \CodeBreaker.lastAttemptDate, order: .reverse)
         }
     }
     
     enum SortOption: CaseIterable {
-        case name, recent
+        case name, recent, completed
         
         var title: String {
             switch self {
             case .name: "Sort by Name"
             case .recent: "Recent"
+            case .completed: "Completed"
             }
         }
     }
+    
+    var summarySize: GameSummary.Size {
+        staticSummarySize * dynamicSummarySizeMagnification
+    }
+    @State private var staticSummarySize: GameSummary.Size = .large
+    @State private var dynamicSummarySizeMagnification: CGFloat = 1.0
     
     var body: some View {
         List(selection: $selection) {
             ForEach(games) { game in
                 NavigationLink(value: game) {
-                    GameSummary(game: game)
+                    GameSummary(game: game, size: summarySize)
                 }
                 .contextMenu {
 //                    editButton(for: game) // editing a game
@@ -66,6 +75,7 @@ struct GameList: View {
 //                games.move(fromOffsets: offsets, toOffset: destination)
 //            }
         }
+        .gesture(summarySizeMagnifier)
         .onChange(of: games) {
             if let selection, !games.contains(selection) {
                 self.selection = nil
@@ -77,6 +87,17 @@ struct GameList: View {
             EditButton() // editing the List of games
         }
         .onAppear { addSampleGames() }
+    }
+    
+    var summarySizeMagnifier: some Gesture {
+        MagnifyGesture()
+            .onChanged { value in
+                dynamicSummarySizeMagnification = value.magnification
+            }
+            .onEnded { value in
+                staticSummarySize = staticSummarySize * value.magnification
+                dynamicSummarySizeMagnification = 1.0
+            }
     }
     
 //    func editButton(for game: CodeBreaker) -> some View {
@@ -132,6 +153,18 @@ struct GameList: View {
             modelContext.insert(CodeBreaker(name: "RGB", pegChoices: ["red", "green", "blue"]))
             modelContext.insert(CodeBreaker(name: "Mastermind", pegChoices: ["blue", "red", "yellow", "green", "cyan", "purple"]))
             modelContext.insert(CodeBreaker(name: "Pastel", pegChoices: ["cyan", "mint", "pink", "purple"]))
+        }
+    }
+}
+
+extension GameSummary.Size {
+    static func *(lhs: Self, rhs: CGFloat) -> Self {
+        switch rhs {
+        case 2.0...: lhs.larger.larger
+        case 1.5...: lhs.larger
+        case ...0.35: lhs.smaller.smaller
+        case ...0.5: lhs.smaller
+        default: lhs
         }
     }
 }

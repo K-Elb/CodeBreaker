@@ -10,6 +10,7 @@ import SwiftUI
 struct CodeBreakerView: View {
     // MARK: Data In
     @Environment(\.scenePhase) var scenePhase
+    @Environment(\.sceneFrame) var sceneFrame
     
     // MARK: Data Shared with Me
     let game: CodeBreaker
@@ -46,10 +47,15 @@ struct CodeBreakerView: View {
                 }
             }
             
-            if !game.isOver {
-                PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                    .transition(.pegChooser)
+            GeometryReader { geometry in
+                if !game.isOver {
+                    let offset = sceneFrame.maxY - geometry.frame(in: .global).minY
+                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                        .transition(.offset(y: offset))
+                }
             }
+            .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
+            .frame(maxHeight: 80)
         }
         .navigationTitle(game.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -66,6 +72,16 @@ struct CodeBreakerView: View {
                     .lineLimit(1)
             }
         }
+        .highPriorityGesture(pegChoosingDial)
+    }
+    
+    var pegChoosingDial: some Gesture {
+        RotationGesture()
+            .onChanged { value in
+                let pegChoicesIndex = Int(abs(value.degrees)/90) %  game.pegChoices.count
+                game.guess.pegs[selection] = game.pegChoices[pegChoicesIndex]
+            }
+        
     }
     
     func changePegAtSelection(to peg: Peg.RawValue) {
@@ -95,39 +111,6 @@ struct CodeBreakerView: View {
                 hideMostRecentMarkers = false
             }
         }
-    }
-}
-
-extension View {
-    func trackElapsedTime(in game: CodeBreaker) -> some View {
-        self
-            .modifier(ElapsedTimeTracker(game: game))
-    }
-}
-
-struct ElapsedTimeTracker: ViewModifier {
-    @Environment(\.scenePhase) var scenePhase
-    let game: CodeBreaker
-    
-    func body(content: Content) -> some View {
-        content
-            .onAppear {
-                game.startTimer()
-            }
-            .onDisappear {
-                game.pauseTimer()
-            }
-            .onChange(of: game) { oldGame, newGame in
-                oldGame.pauseTimer()
-                newGame.startTimer()
-            }
-            .onChange(of: scenePhase) {
-                switch scenePhase {
-                case .active: game.startTimer()
-                case .background: game.pauseTimer()
-                default: break
-                }
-            }
     }
 }
 

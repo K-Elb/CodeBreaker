@@ -19,6 +19,7 @@ class CodeBreaker {
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
     var lastAttemptDate: Date? = Date.now
+    var isOver: Bool = false
     
     init(name: String = "Code Breaker", pegChoices : [Peg.RawValue]) {
         self.name = name
@@ -46,6 +47,11 @@ class CodeBreaker {
         startTime = nil
     }
     
+    func updateElapsedTime() {
+        pauseTimer()
+        startTimer()
+    }
+    
     func restart() {
         masterCode.kind = .master(isHidden: true)
         masterCode.randomise(from: pegChoices)
@@ -54,10 +60,7 @@ class CodeBreaker {
         startTime = .now
         endTime = nil
         elapsedTime = 0
-    }
-    
-    var isOver: Bool {
-        attempts.first?.pegs == masterCode.pegs
+        isOver = false
     }
     
     func attemptGuess() {
@@ -66,7 +69,8 @@ class CodeBreaker {
         attempts.insert(attempt, at: 0)
         lastAttemptDate = Date.now
         guess.reset()
-        if isOver {
+        if attempts.first?.pegs == masterCode.pegs {
+            isOver = true
             masterCode.kind = .master(isHidden: false)
             endTime = .now
             pauseTimer()
