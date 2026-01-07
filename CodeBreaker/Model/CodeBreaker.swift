@@ -9,17 +9,19 @@ import Foundation
 import SwiftData
 
 @Model
-class CodeBreaker {
-    var name: String
+final class CodeBreaker {
+    var name: String = ""
     @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
     @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
-    @Relationship(deleteRule: .cascade) var _attempts: [Code] = []
-    var pegChoices: [Peg.RawValue]
+    @Relationship(deleteRule: .cascade, inverse: \Code.game) var _attempts: [Code] = []
+    var pegChoices: [Peg.RawValue] = []
     @Transient var startTime: Date? // doesn't change UI
     var endTime: Date?
     var elapsedTime: TimeInterval = 0
     var lastAttemptDate: Date? = Date.now
     var isOver: Bool = false
+    
+    init() { }
     
     init(name: String = "Code Breaker", pegChoices : [Peg.RawValue]) {
         self.name = name

@@ -67,6 +67,15 @@ struct CodeBreakerView: View {
             }
             
             ToolbarItem {
+                Button("Save", systemImage: "square.and.arrow.down") {
+                    if let json = try? JSONEncoder().encode(game) {
+                        let url = URL.documentsDirectory.appendingPathComponent(game.name).appendingPathExtension("json")
+                        try? json.write(to: url)
+                    }
+                }
+            }
+            
+            ToolbarItem {
                 ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
                     .monospaced()
                     .lineLimit(1)

@@ -10,15 +10,18 @@ import Foundation
 import SwiftData
 
 @Model
-class Code {
+final class Code {
     var _kind: String = Kind.unknown.description
-    var pegs: [Peg.RawValue]
+    var pegs: [Peg.RawValue] = []
     var timestamp = Date.now
+    var game: CodeBreaker?
     
     var kind: Kind {
         get { return Kind(_kind) }
         set { _kind = newValue.description }
     }
+    
+    init() { }
     
     init(kind: Kind, pegs: [Peg.RawValue] = Array(repeating: Code.missingPeg, count: 4)) {
         self.pegs = pegs
