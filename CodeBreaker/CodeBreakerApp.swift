@@ -13,9 +13,22 @@ struct CodeBreakerApp: App {
     var body: some Scene {
         WindowGroup {
             GeometryReader { geometry in
-                GameChooser()
-                    .modelContainer(for: CodeBreaker.self)
-                    .environment(\.sceneFrame, geometry.frame(in: .global))
+                TabView {
+                    Tab {
+                        GameChooser()
+                            .modelContainer(for: CodeBreaker.self)
+                            .environment(\.sceneFrame, geometry.frame(in: .global))
+                    } label: {
+                        Label("Game", systemImage: "flame")
+                    }
+                    Tab {
+                        NavigationStack {
+                            WordBreakerView()
+                        }
+                    } label: {
+                        Label("Word", systemImage: "sparkles")
+                    }
+                }
             }
         }
     }

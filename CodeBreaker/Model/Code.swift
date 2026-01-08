@@ -51,8 +51,8 @@ final class Code {
         print(self.pegs)
     }
     
-    func reset() {
-        pegs = Array(repeating: Code.missingPeg, count: 4)
+    func reset(length: Int) {
+        pegs = Array(repeating: Code.missingPeg, count: length)
     }
     
     func match(against otherCode: Code) -> [Match] {

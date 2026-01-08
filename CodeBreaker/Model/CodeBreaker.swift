@@ -57,7 +57,7 @@ final class CodeBreaker {
     func restart() {
         masterCode.kind = .master(isHidden: true)
         masterCode.randomise(from: pegChoices)
-        guess.reset()
+        guess.reset(length: 4)
         attempts.removeAll()
         startTime = .now
         endTime = nil
@@ -70,7 +70,7 @@ final class CodeBreaker {
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         lastAttemptDate = Date.now
-        guess.reset()
+        guess.reset(length: 4)
         if attempts.first?.pegs == masterCode.pegs {
             isOver = true
             masterCode.kind = .master(isHidden: false)
