@@ -27,69 +27,62 @@ struct WordBreakerView: View {
     // MARK: - Body
     
     var body: some View {
-        VStack {
-            CodeViewWords(code: game.masterWord)
-                .background {
-                    TextField("Type letter", text: $word)
-                        .focused($isFocused)
-                        .autocorrectionDisabled()
-                        .keyboardType(.alphabet)
-                        .onChange(of: word) {
-                            if word != "" {
-                                changePegAtSelection(to: word)
+        NavigationStack {
+            VStack {
+                CodeViewWords(code: game.masterWord)
+                    .background {
+                        TextField("Type letter", text: $word)
+                            .focused($isFocused)
+                            .autocorrectionDisabled()
+                            .keyboardType(.alphabet)
+                            .onChange(of: word) {
+                                if word != "" {
+                                    changePegAtSelection(to: word)
+                                }
                             }
+                            .onSubmit {
+                                guess()
+                            }
+                            .opacity(0)
+                            .frame(width: 0, height: 0)
+                    }
+                
+                ScrollView {
+                    if !game.isOver {
+                        CodeViewWords(code: game.guess, selection: $selection, isFocused: $focus)
+                            .animation(nil, value: game.attempts.count)
+                            .opacity(restarting ? 0 : 1)
+                            .onChange(of: focus) {
+                                isFocused = true
+                            }
+                    }
+                    
+                    ForEach(game.attempts, id: \.pegs) { attempt in
+                        let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
+                        if let matches = attempt.matches {
+                            CodeViewWords(code: attempt, showMarkers: showMarkers, matches: matches)
+                                .transition(.attempt(game.isOver))
                         }
-                        .onSubmit {
-                            guess()
-                        }
-                        .opacity(0)
-                        .frame(width: 0, height: 0)
+                    }
                 }
-            
-            ScrollView {
-                if !game.isOver {
-                    CodeViewWords(code: game.guess, selection: $selection, isFocused: $focus)
-                        .animation(nil, value: game.attempts.count)
-                        .opacity(restarting ? 0 : 1)
-                        .onChange(of: focus) {
-                            isFocused = true
-                        }
+            }
+            .navigationTitle(game.name)
+            .navigationBarTitleDisplayMode(.inline)
+            .padding(.horizontal)
+            .onChange(of: words.count) {
+                randomWord()
+            }
+            .trackElapsedTime(in: game)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Restart", systemImage: "arrow.circlepath", action: restart)
                 }
                 
-                ForEach(game.attempts, id: \.pegs) { attempt in
-                    let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
-                    if let matches = attempt.matches {
-                        CodeViewWords(code: attempt, showMarkers: showMarkers, matches: matches)
-                        .transition(.attempt(game.isOver))
-                    }     
+                ToolbarItem {
+                    ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
+                        .monospaced()
+                        .lineLimit(1)
                 }
-            }
-        }
-        .navigationTitle(game.name)
-        .navigationBarTitleDisplayMode(.inline)
-        .padding(.horizontal)
-        .onChange(of: words.count) {
-            randomWord()
-        }
-//        .trackElapsedTime(in: game)
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Restart", systemImage: "arrow.circlepath", action: restart)
-            }
-            
-//            ToolbarItem {
-//                Button("Save", systemImage: "square.and.arrow.down") {
-//                    if let json = try? JSONEncoder().encode(game) {
-//                        let url = URL.documentsDirectory.appendingPathComponent(game.name).appendingPathExtension("json")
-//                        try? json.write(to: url)
-//                    }
-//                }
-//            }
-            
-            ToolbarItem {
-                ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
-                    .monospaced()
-                    .lineLimit(1)
             }
         }
     }

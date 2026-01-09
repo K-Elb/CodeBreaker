@@ -19,14 +19,12 @@ struct CodeBreakerApp: App {
                             .modelContainer(for: CodeBreaker.self)
                             .environment(\.sceneFrame, geometry.frame(in: .global))
                     } label: {
-                        Label("Game", systemImage: "flame")
+                        Label("Colors", systemImage: "paintbrush.fill")
                     }
                     Tab {
-                        NavigationStack {
-                            WordBreakerView()
-                        }
+                        WordBreakerView()
                     } label: {
-                        Label("Word", systemImage: "sparkles")
+                        Label("Words", systemImage: "characters.uppercase")
                     }
                 }
             }

@@ -75,5 +75,5 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
 fileprivate struct Selection {
     static let border: CGFloat = 4
     static let color: Color = Color.gray(0.8)
-    static let shape = Circle()
+    static let shape = RoundedRectangle(cornerRadius: 16)
 }

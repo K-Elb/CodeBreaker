@@ -46,7 +46,7 @@ struct CodeViewWords: View {
                             Group {
                                 if selection == index, code.kind == .guess {
                                     Selection.shape
-                                        .foregroundStyle(Selection.color)
+                                        .fill(Selection.color)
                                         .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
                                 }
                             }

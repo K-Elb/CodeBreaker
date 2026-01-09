@@ -8,8 +8,8 @@
 import Foundation
 
 @Observable
-class WordBreaker {
-    var name: String = ""
+class WordBreaker: Equatable {
+    var name: String = "Word Breaker"
     var masterWord: Code = Code(kind: .master(isHidden: true), pegs: Array(repeating: "", count: 5))
     var guess: Code = Code(kind: .guess, pegs: Array(repeating: "", count: 5))
     var _attempts: [Code] = []
@@ -22,6 +22,10 @@ class WordBreaker {
     var attempts: [Code] {
         get { _attempts.sorted {$0.timestamp > $1.timestamp} }
         set { _attempts = newValue }
+    }
+    
+    static func == (lhs: WordBreaker, rhs: WordBreaker) -> Bool {
+        lhs.name == rhs.name
     }
     
     func restart() {
@@ -65,5 +69,10 @@ class WordBreaker {
         }
         
         startTime = nil
+    }
+    
+    func updateElapsedTime() {
+        pauseTimer()
+        startTimer()
     }
 }
