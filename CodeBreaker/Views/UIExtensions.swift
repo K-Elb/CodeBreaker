@@ -19,13 +19,13 @@ extension AnyTransition {
     static func attempt(_ isOver: Bool) -> AnyTransition {
         AnyTransition.asymmetric(
             insertion: isOver ? .opacity : .move(edge: .top),
-            removal: .move(edge: .trailing)
+            removal: .push(from: .top)
         )
     }
 }
 
 extension View {
-    func flexibleSystemFont(min: CGFloat = 8, max: CGFloat = 80) -> some View {
+    func flexibleSystemFont(min: CGFloat = 4, max: CGFloat = 32) -> some View {
         self
             .font(.system(size: max))
             .minimumScaleFactor(min/max)

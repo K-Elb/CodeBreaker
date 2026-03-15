@@ -18,56 +18,56 @@ struct CodeBreakerView: View {
     // MARK: Data Owned by Me
     @State private var selection: Int = 0
     @State private var restarting = false
-    @State private var hideMostRecentMarkers = false
+//    @State private var hideMostRecentMarkers = false
+    @State private var guessButton: Bool = false
+    @State private var pegButton: Bool = false
+    @State private var doneButton: Bool = false
+
     
     // MARK: - Body
     
     var body: some View {
-        ZStack(alignment: .top) {
-            
-            
-            VStack {
-                ScrollView {
-                    if !game.isOver {
-                        CodeView(code: game.guess, selection: $selection)
-                            .animation(nil, value: game.attempts.count)
-                            .opacity(restarting ? 0 : 1)
-                    }
-                    
-                    ForEach(game.attempts, id: \.pegs) { attempt in
-                        let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
-                        if showMarkers, let matches = attempt.matches {
-                            CodeView(code: attempt, showMarkers: showMarkers, matches: matches)
-                                .transition(.attempt(game.isOver))
-                        }
-                    }
+        VStack {
+            ScrollView(showsIndicators: false) {
+                CodeView(code: game.masterCode)
+                    .sensoryFeedback(.success, trigger: doneButton)
+                
+                if !game.isOver {
+                    CodeView(code: game.guess, selection: $selection)
+                        .animation(nil, value: game.attempts.count)
+                        .opacity(restarting ? 0 : 1)
                 }
                 
-                GeometryReader { geometry in
-                    VStack {
-                        if !game.isOver {
-                            let offset = sceneFrame.maxY - geometry.frame(in: .global).minY
-                            PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                                .transition(.offset(y: offset))
-                        }
+                ForEach(game.attempts, id: \.pegs) { attempt in
+                    if let matches = attempt.matches {
+                        CodeView(code: attempt, matches: matches)
+                            .transition(.attempt(game.isOver))
                     }
                 }
-                .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
-                //            .frame(maxHeight: 80)
-                
-                Button(action: guess) {
-                    Label("Guess", systemImage: "arrow.2.circlepath.circle")
-                        .frame(maxWidth: .infinity)
-                        .foregroundStyle(.wb)
-                }
-                .buttonStyle(.borderedProminent)
             }
             
-            CodeView(code: game.masterCode)
+            if !game.isOver {
+                VStack {
+                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                        .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
+                        .sensoryFeedback(.impact(flexibility: .soft), trigger: pegButton)
+//                        .frame(maxHeight: 80)
+
+                    Button(action: guess) {
+                        Text("Guess")
+                            .frame(maxWidth: .infinity)
+                            .font(.title2)
+                    }
+                    .buttonStyle(.glass)
+                    .sensoryFeedback(.impact, trigger: guessButton)
+                }
+                .padding(.horizontal)
+                .transition(.push(from: .top))
+                .opacity(restarting ? 0 : 1)
+            }
         }
         .navigationTitle(game.name)
         .navigationBarTitleDisplayMode(.inline)
-        .padding(.horizontal)
         .trackElapsedTime(in: game)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -102,6 +102,7 @@ struct CodeBreakerView: View {
     }
     
     func changePegAtSelection(to peg: Peg.RawValue) {
+        pegButton.toggle()
         game.setGuessPeg(peg, at: selection)
         selection = (selection + 1) % game.masterCode.pegs.count
     }
@@ -121,11 +122,16 @@ struct CodeBreakerView: View {
     func guess() {
         withAnimation(.guess) {
             game.attemptGuess()
+            if game.isOver {
+                doneButton.toggle()
+            } else {
+                guessButton.toggle()
+            }
             selection = 0
-            hideMostRecentMarkers = true
+//            hideMostRecentMarkers = true
         } completion: {
             withAnimation(.guess) {
-                hideMostRecentMarkers = false
+//                hideMostRecentMarkers = false
             }
         }
     }
@@ -133,5 +139,8 @@ struct CodeBreakerView: View {
 
 #Preview(traits: .swiftData) {
     @Previewable @State var game = CodeBreaker(name: "", pegChoices: ["blue", "red", "yellow", "green"])
-    CodeBreakerView(game: game)
+    
+    NavigationView {
+        CodeBreakerView(game: game)
+    }
 }

@@ -10,7 +10,6 @@ import SwiftUI
 struct CodeView<AncillaryView>: View where AncillaryView: View {
     // MARK: Data in
     let code: Code
-    let showMarkers: Bool
     let matches: [Match]
     
     // MARK: Data Shared with Me
@@ -23,13 +22,11 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     
     init(
         code: Code,
-        showMarkers: Bool = false,
         matches: [Match] = [],
         selection: Binding<Int> = .constant(-1),
         @ViewBuilder ancillaryView: @escaping () -> AncillaryView = { EmptyView() }
     ) {
         self.code = code
-        self.showMarkers = showMarkers
         self.matches = matches
         self._selection = selection
         self.ancillaryView = ancillaryView
@@ -40,53 +37,49 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
     var body: some View {
         HStack {
             ForEach(code.pegs.indices , id: \.self) { index in
-                if code.isHidden {
-                    RoundedRectangle(cornerRadius: 12)
-                        .glassEffect(.clear, in: RoundedRectangle(cornerRadius: 12))
-                        .aspectRatio(1, contentMode: .fit)
-                } else {
-                    ZStack(alignment: .topTrailing) {
-                        PegView(peg: code.pegs[index])
-                            .padding(Selection.border)
-                            .background {
-                                Group {
-                                    if selection == index, code.kind == .guess {
-                                        Selection.shape
-                                            .foregroundStyle(Selection.color)
-                                            .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
+                ZStack(alignment: .topTrailing) {
+                    PegView(peg: code.pegs[index])
+                        .overlay {
+                            
+                            
+                            Selection.shape
+                                .foregroundStyle(code.isHidden ? Color.gray : .clear)
+                                .transaction { transaction in
+                                    if code.isHidden {
+                                        transaction.animation = nil
                                     }
                                 }
-                                .animation(.selection, value: selection)
-                            }
-                            .overlay {
-                                Selection.shape
-                                    .foregroundStyle(code.isHidden ? Color.gray : .clear)
-                                    .transaction { transaction in
-                                        if code.isHidden {
-                                            transaction.animation = nil
-                                        }
-                                    }
-                            }
-                            .onTapGesture {
-                                if code.kind == .guess {
-                                    selection = index
-                                }
-                            }
-                        
-                        if showMarkers, !matches.isEmpty {
-                            matchMarker(match: matches[index])
                         }
+                        .onTapGesture {
+                            if code.kind == .guess {
+                                selection = index
+                            }
+                        }
+                    
+                    Group {
+                        if selection == index, code.kind == .guess {
+                            Selection.shape
+                                .glassEffect(.clear, in: Selection.shape)
+                                .padding(6)
+                                .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
+                                .overlay {
+                                    if let peg = Peg(rawValue: code.pegs[index]), peg != .clear {
+                                        Image(systemName: peg.symbol)
+                                            .flexibleSystemFont()
+                                            .foregroundStyle(.wb)
+                                    }
+                                }
+                        }
+                    }
+                    .animation(.selection, value: selection)
+                    
+                    if !matches.isEmpty {
+                        matchMarker(match: matches[index])
                     }
                 }
             }
-            
-//            Circle()
-//                .foregroundStyle(.clear)
-//                .aspectRatio(1, contentMode: .fit)
-//                .overlay {
-//                    ancillaryView()
-//                }
         }
+        .padding(.horizontal)
     }
     
     func matchMarker(match: Match) -> some View {
@@ -95,12 +88,12 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             .strokeBorder(match != .nomatch ? Color.primary : Color.clear, lineWidth: 2)
             .aspectRatio(1, contentMode: .fit)
             .frame(maxWidth: 16)
-            .padding(8)
+            .padding(6)
     }
 }
 
 fileprivate struct Selection {
-    static let border: CGFloat = 0
-    static let color: Color = Color.gray(0.9)
-    static let shape = RoundedRectangle(cornerRadius: 16)
+    static let border: CGFloat = 4
+    static let color: Color = Color.gray(0.8)
+    static let shape = RoundedRectangle(cornerRadius: 12)
 }

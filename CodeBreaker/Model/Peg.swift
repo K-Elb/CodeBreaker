@@ -25,7 +25,7 @@ enum Peg: String, Identifiable, CaseIterable {
         case .brown: return .brown
         case .indigo: return .indigo
         case .teal: return .teal
-        default : return .clear
+        default : return .gray.opacity(0.2)
         }
     }
     

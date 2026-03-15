@@ -19,9 +19,11 @@ struct PegView: View {
         if let peg = Peg(rawValue: peg) {
             pegShape
                 .overlay {
-                    Image(systemName: peg.symbol)
-                        .font(.title2.bold())
-                        .foregroundStyle(.wb)
+                    if peg != .clear {
+                        Image(systemName: peg.symbol)
+                            .flexibleSystemFont()
+                            .foregroundStyle(.wb)
+                    }
                 }
                 .contentShape(pegShape)
                 .aspectRatio(1, contentMode: .fit)
