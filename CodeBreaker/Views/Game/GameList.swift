@@ -74,6 +74,10 @@ struct GameList: View {
 //            .onMove { offsets, destination in
 //                games.move(fromOffsets: offsets, toOffset: destination)
 //            }
+            
+            NavigationLink(destination: WordBreakerView()) {
+                Label("Word Breaker", systemImage: "flame")
+            }
         }
         .gesture(summarySizeMagnifier)
         .onChange(of: games) {
@@ -83,10 +87,21 @@ struct GameList: View {
         }
         .listStyle(.plain)
         .toolbar {
-            addButton
-            EditButton() // editing the List of games
+//            DefaultToolbarItem(kind: .search, placement: .bottomBar)
+//
+//            ToolbarSpacer(.flexible, placement: .bottomBar)
+            
+            ToolbarItem {
+                addButton
+            }
+            
+            ToolbarItem {
+                EditButton() // editing the List of games
+            }
         }
         .task { await addSampleGames() }
+        
+        
     }
     
     var summarySizeMagnifier: some Gesture {

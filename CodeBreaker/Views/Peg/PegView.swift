@@ -13,19 +13,19 @@ struct PegView: View {
     
     // MARK: - Body
     
-    let pegShape = RoundedRectangle(cornerRadius: 16)
+    let pegShape = RoundedRectangle(cornerRadius: 12)
     
     var body: some View {
         if let peg = Peg(rawValue: peg) {
             pegShape
                 .overlay {
                     Image(systemName: peg.symbol)
-                        .font(.title2)
-                        .foregroundStyle(peg.color.gradient)
+                        .font(.title2.bold())
+                        .foregroundStyle(.wb)
                 }
                 .contentShape(pegShape)
                 .aspectRatio(1, contentMode: .fit)
-                .foregroundStyle(peg.color.opacity(0.2))
+                .foregroundStyle(peg.color)
         } else {
             pegShape
                 .foregroundStyle(.gray.opacity(0.2))
@@ -54,5 +54,5 @@ struct Diamond: Shape {
 }
 
 #Preview {
-    PegView(peg: "s")
+    PegView(peg: "red")
 }

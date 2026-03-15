@@ -30,14 +30,14 @@ struct GameChooser: View {
                 .navigationTitle("Code Breaker")
                 .searchable(text: $search)
                 .animation(.easeInOut, value: search)
-            
         } detail: {
             if let selection {
                 CodeBreakerView(game: selection)
                     .navigationTitle(selection.name)
                     .navigationBarTitleDisplayMode(.inline)
             } else {
-                Text("Choose a game!")
+//                Text("Choose a game!")
+                WordBreakerView()
             }
         }
         .navigationSplitViewStyle(.balanced)

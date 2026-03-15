@@ -23,39 +23,47 @@ struct CodeBreakerView: View {
     // MARK: - Body
     
     var body: some View {
-        VStack {
-            CodeView(code: game.masterCode)
+        ZStack(alignment: .top) {
             
-            ScrollView {
-                if !game.isOver {
-                    CodeView(code: game.guess, selection: $selection) {
-                        Button("Guess", action: guess)
-                            .flexibleSystemFont()
+            
+            VStack {
+                ScrollView {
+                    if !game.isOver {
+                        CodeView(code: game.guess, selection: $selection)
+                            .animation(nil, value: game.attempts.count)
+                            .opacity(restarting ? 0 : 1)
                     }
-                    .animation(nil, value: game.attempts.count)
-                    .opacity(restarting ? 0 : 1)
-                }
-                
-                ForEach(game.attempts, id: \.pegs) { attempt in
-                    CodeView(code: attempt) {
+                    
+                    ForEach(game.attempts, id: \.pegs) { attempt in
                         let showMarkers = !hideMostRecentMarkers || attempt.pegs != game.attempts.first?.pegs
                         if showMarkers, let matches = attempt.matches {
-                            MatchMarkers(matches: matches)
+                            CodeView(code: attempt, showMarkers: showMarkers, matches: matches)
+                                .transition(.attempt(game.isOver))
                         }
                     }
-                    .transition(.attempt(game.isOver))
                 }
+                
+                GeometryReader { geometry in
+                    VStack {
+                        if !game.isOver {
+                            let offset = sceneFrame.maxY - geometry.frame(in: .global).minY
+                            PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                                .transition(.offset(y: offset))
+                        }
+                    }
+                }
+                .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
+                //            .frame(maxHeight: 80)
+                
+                Button(action: guess) {
+                    Label("Guess", systemImage: "arrow.2.circlepath.circle")
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(.wb)
+                }
+                .buttonStyle(.borderedProminent)
             }
             
-            GeometryReader { geometry in
-                if !game.isOver {
-                    let offset = sceneFrame.maxY - geometry.frame(in: .global).minY
-                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                        .transition(.offset(y: offset))
-                }
-            }
-            .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
-            .frame(maxHeight: 80)
+            CodeView(code: game.masterCode)
         }
         .navigationTitle(game.name)
         .navigationBarTitleDisplayMode(.inline)
