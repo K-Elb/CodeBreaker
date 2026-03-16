@@ -40,8 +40,6 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                 ZStack(alignment: .topTrailing) {
                     PegView(peg: code.pegs[index])
                         .overlay {
-                            
-                            
                             Selection.shape
                                 .foregroundStyle(code.isHidden ? Color.gray : .clear)
                                 .transaction { transaction in

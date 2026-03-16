@@ -20,51 +20,71 @@ struct CodeBreakerView: View {
     @State private var restarting = false
 //    @State private var hideMostRecentMarkers = false
     @State private var guessButton: Bool = false
+    @State private var warningButton: Bool = false
     @State private var pegButton: Bool = false
     @State private var doneButton: Bool = false
+    @State private var shakeOffset: CGFloat = 0
 
     
     // MARK: - Body
     
     var body: some View {
         VStack {
-            ScrollView(showsIndicators: false) {
-                CodeView(code: game.masterCode)
-                    .sensoryFeedback(.success, trigger: doneButton)
+            ZStack(alignment: .bottom) {
+                ScrollView(showsIndicators: false) {
+                    CodeView(code: game.masterCode)
+                        .sensoryFeedback(.success, trigger: doneButton)
+                    
+                    if !game.isOver {
+                        CodeView(code: game.guess, selection: $selection)
+                            .animation(nil, value: game.attempts.count)
+                            .opacity(restarting ? 0 : 1)
+                    }
+                    
+                    ForEach(game.attempts, id: \.pegs) { attempt in
+                        if let matches = attempt.matches {
+                            CodeView(code: attempt, matches: matches)
+                                .transition(.attempt(game.isOver))
+                        }
+                    }
+                }
                 
                 if !game.isOver {
-                    CodeView(code: game.guess, selection: $selection)
-                        .animation(nil, value: game.attempts.count)
-                        .opacity(restarting ? 0 : 1)
-                }
-                
-                ForEach(game.attempts, id: \.pegs) { attempt in
-                    if let matches = attempt.matches {
-                        CodeView(code: attempt, matches: matches)
-                            .transition(.attempt(game.isOver))
+                    VStack {
+                        PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
+                            .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
+                            .sensoryFeedback(.impact(flexibility: .soft), trigger: pegButton)
+//                            .frame(maxHeight: 80)
+                            
+                        
+                        HStack {
+                            Button(action: clear) {
+                                Label("Clear", systemImage: "eraser.fill")
+                                    .frame(maxWidth: .infinity)
+                                    .font(.title2.bold())
+                            }
+                            .buttonStyle(.glass)
+                            
+                            Button(action: guess) {
+                                Label("Guess", systemImage: "questionmark")
+                                    .frame(maxWidth: .infinity)
+                                    .font(.title2.bold())
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .sensoryFeedback(.impact, trigger: guessButton)
+                            .sensoryFeedback(.warning, trigger: warningButton)
+                        }
+                        .padding(.horizontal)
                     }
+                    .padding(8)
+                    .padding(.bottom, 8)
+                    .glassEffect(.regular, in: .rect)
+                    .transition(.push(from: .top))
+                    .opacity(restarting ? 0 : 1)
+                    .offset(x: shakeOffset)
                 }
             }
-            
-            if !game.isOver {
-                VStack {
-                    PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                        .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
-                        .sensoryFeedback(.impact(flexibility: .soft), trigger: pegButton)
-//                        .frame(maxHeight: 80)
-
-                    Button(action: guess) {
-                        Text("Guess")
-                            .frame(maxWidth: .infinity)
-                            .font(.title2)
-                    }
-                    .buttonStyle(.glass)
-                    .sensoryFeedback(.impact, trigger: guessButton)
-                }
-                .padding(.horizontal)
-                .transition(.push(from: .top))
-                .opacity(restarting ? 0 : 1)
-            }
+            .ignoresSafeArea(edges: .bottom)
         }
         .navigationTitle(game.name)
         .navigationBarTitleDisplayMode(.inline)
@@ -121,17 +141,45 @@ struct CodeBreakerView: View {
     
     func guess() {
         withAnimation(.guess) {
-            game.attemptGuess()
-            if game.isOver {
-                doneButton.toggle()
+            if game.validAttempt() {
+                game.attemptGuess()
+                selection = 0
+                if game.isOver {
+                    doneButton.toggle()
+                } else {
+                    guessButton.toggle()
+                }
             } else {
-                guessButton.toggle()
+                shake()
+                warningButton.toggle()
             }
-            selection = 0
 //            hideMostRecentMarkers = true
         } completion: {
             withAnimation(.guess) {
 //                hideMostRecentMarkers = false
+            }
+        }
+    }
+    
+    func clear() {
+        withAnimation {
+            game.guess.reset(length: game.codeLength)
+            selection = 0
+        }
+    }
+    
+    func shake() {
+        withAnimation(.easeInOut(duration: 0.1)) {
+            shakeOffset = 4
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            withAnimation(.easeInOut(duration: 0.1)) {
+                shakeOffset = -4
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            withAnimation(.easeInOut(duration: 0.1)) {
+                shakeOffset = 0
             }
         }
     }
