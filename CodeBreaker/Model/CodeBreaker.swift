@@ -11,8 +11,8 @@ import SwiftData
 @Model
 final class CodeBreaker {
     var name: String = ""
-    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true))
-    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess)
+    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true), pegs: [])
+    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, pegs: [])
     @Relationship(deleteRule: .cascade, inverse: \Code.game) var _attempts: [Code] = []
     var pegChoices: [Peg.RawValue] = []
     @Transient var startTime: Date? // doesn't change UI
@@ -20,12 +20,16 @@ final class CodeBreaker {
     var elapsedTime: TimeInterval = 0
     var lastAttemptDate: Date? = Date.now
     var isOver: Bool = false
+    var codeLength: Int = 4
     
     init() { }
     
-    init(name: String = "Code Breaker", pegChoices : [Peg.RawValue]) {
+    init(name: String = "Code Breaker", pegChoices : [Peg.RawValue], codeLength: Int = 4) {
         self.name = name
         self.pegChoices = pegChoices
+        self.codeLength = codeLength
+        masterCode = Code(kind: .master(isHidden: true), pegs: Array(repeating: Code.missingPeg, count: codeLength))
+        guess = Code(kind: .guess, pegs: Array(repeating: Code.missingPeg, count: codeLength))
         masterCode.randomise(from: pegChoices)
     }
     
@@ -57,7 +61,7 @@ final class CodeBreaker {
     func restart() {
         masterCode.kind = .master(isHidden: true)
         masterCode.randomise(from: pegChoices)
-        guess.reset(length: 4)
+        guess.reset(length: codeLength)
         attempts.removeAll()
         startTime = .now
         endTime = nil
@@ -65,12 +69,18 @@ final class CodeBreaker {
         isOver = false
     }
     
+    func validAttempt() -> Bool {
+        guard !attempts.contains(where: { $0.pegs == guess.pegs }) else { return false }
+        guard guess.pegs != Array(repeating: Code.missingPeg, count: codeLength) else { return false }
+        guard !guess.pegs.contains(where: { $0 == Code.missingPeg }) else { return false }
+        return true
+    }
+    
     func attemptGuess() {
-        guard !attempts.contains(where: { $0.pegs == guess.pegs }) else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         lastAttemptDate = Date.now
-        guess.reset(length: 4)
+        guess.reset(length: codeLength)
         if attempts.first?.pegs == masterCode.pegs {
             isOver = true
             masterCode.kind = .master(isHidden: false)

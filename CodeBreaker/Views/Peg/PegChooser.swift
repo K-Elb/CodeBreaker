@@ -17,14 +17,19 @@ struct PegChooser: View {
     // MARK: - Body
     
     var body: some View {
-        HStack {
-            ForEach(choices, id: \.self) { peg in
-                Button {
-                    onChoose?(peg)
-                } label: {
-                    PegView(peg: peg)
-                }
+        LazyVGrid(columns: [GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48))]) {
+            ForEach(choices.indices, id: \.self) { i in
+                    Button {
+                        onChoose?(choices[i])
+                    } label: {
+                        PegView(peg: choices[i])
+                    }
             }
         }
+//        .aspectRatio(CGFloat(choices.count), contentMode: .fit)
     }
+}
+
+#Preview {
+    PegChooser(choices: ["red", "blue", "yellow", "green", "orange", "pink"])
 }

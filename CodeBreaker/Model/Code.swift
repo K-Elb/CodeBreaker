@@ -23,7 +23,7 @@ final class Code {
     
     init() { }
     
-    init(kind: Kind, pegs: [Peg.RawValue] = Array(repeating: Code.missingPeg, count: 4)) {
+    init(kind: Kind, pegs: [Peg.RawValue]) {
         self.pegs = pegs
         self.kind = kind
     }

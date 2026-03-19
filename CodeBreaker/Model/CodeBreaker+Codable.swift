@@ -19,6 +19,7 @@ extension CodeBreaker: Codable {
         case elapsedTime
         case lastAttemptDate
         case isOver
+        case codeLength
     }
     
     convenience init(from decoder: Decoder) throws {
@@ -35,6 +36,7 @@ extension CodeBreaker: Codable {
         self.elapsedTime = try container.decode(TimeInterval.self, forKey: .elapsedTime)
         self.lastAttemptDate = try container.decodeIfPresent(Date.self, forKey: .lastAttemptDate)
         self.isOver = try container.decode(Bool.self, forKey: .isOver)
+        self.codeLength = try container.decode(Int.self, forKey: .codeLength)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -49,6 +51,7 @@ extension CodeBreaker: Codable {
         try container.encode(elapsedTime, forKey: .elapsedTime)
         try container.encodeIfPresent(lastAttemptDate, forKey: .lastAttemptDate)
         try container.encode(isOver, forKey: .isOver)
+        try container.encode(codeLength, forKey: .codeLength)
     }
 }
 
@@ -57,6 +60,7 @@ extension Code: Codable {
         case _kind
         case pegs
         case timestamp
+        case length
     }
     
     convenience init(from decoder: Decoder) throws {

@@ -33,11 +33,7 @@ struct PegChoicesChooser: View {
     func button(_ peg: Peg) -> some View {
         if peg != .clear {
             PegView(peg: peg.rawValue)
-                .padding(4)
-                .background {
-                    Circle()
-                        .foregroundStyle(pegChoices.contains(where: { $0 == peg.rawValue }) ? Color.gray(0.8) : .clear)
-                }
+                .opacity(pegChoices.contains(where: { $0 == peg.rawValue }) ? 1.0 : 0.3)
                 .onTapGesture {
                     selectPeg(peg)
                 }
@@ -46,7 +42,7 @@ struct PegChoicesChooser: View {
 }
 
 #Preview {
-    @Previewable @State var pegChoices: [Peg.RawValue] = ["green", "orange"]
+    @Previewable @State var pegChoices: [Peg.RawValue] = ["red", "orange"]
     PegChoicesChooser(pegChoices: $pegChoices)
         .onChange(of: pegChoices) {
             print("pegChoices = \(pegChoices)")

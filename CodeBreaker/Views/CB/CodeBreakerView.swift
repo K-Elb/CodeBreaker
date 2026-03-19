@@ -18,7 +18,6 @@ struct CodeBreakerView: View {
     // MARK: Data Owned by Me
     @State private var selection: Int = 0
     @State private var restarting = false
-//    @State private var hideMostRecentMarkers = false
     @State private var guessButton: Bool = false
     @State private var warningButton: Bool = false
     @State private var pegButton: Bool = false
@@ -52,10 +51,7 @@ struct CodeBreakerView: View {
                 if !game.isOver {
                     VStack {
                         PegChooser(choices: game.pegChoices, onChoose: changePegAtSelection)
-                            .aspectRatio(CGFloat(game.pegChoices.count), contentMode: .fit)
                             .sensoryFeedback(.impact(flexibility: .soft), trigger: pegButton)
-//                            .frame(maxHeight: 80)
-                            
                         
                         HStack {
                             Button(action: clear) {
@@ -67,6 +63,7 @@ struct CodeBreakerView: View {
                             
                             Button(action: guess) {
                                 Label("Guess", systemImage: "questionmark")
+                                    .foregroundStyle(.wb)
                                     .frame(maxWidth: .infinity)
                                     .font(.title2.bold())
                             }
@@ -77,8 +74,8 @@ struct CodeBreakerView: View {
                         .padding(.horizontal)
                     }
                     .padding(8)
-                    .padding(.bottom, 8)
-                    .glassEffect(.regular, in: .rect)
+                    .padding(.bottom)
+                    .glassEffect(.regular, in: RoundedRectangle(cornerRadius: 16))
                     .transition(.push(from: .top))
                     .opacity(restarting ? 0 : 1)
                     .offset(x: shakeOffset)
@@ -146,17 +143,15 @@ struct CodeBreakerView: View {
                 selection = 0
                 if game.isOver {
                     doneButton.toggle()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                        restart()
+                    }
                 } else {
                     guessButton.toggle()
                 }
             } else {
                 shake()
                 warningButton.toggle()
-            }
-//            hideMostRecentMarkers = true
-        } completion: {
-            withAnimation(.guess) {
-//                hideMostRecentMarkers = false
             }
         }
     }

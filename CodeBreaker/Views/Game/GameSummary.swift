@@ -36,7 +36,7 @@ struct GameSummary: View {
                 .font(.title2)
             
             PegChooser(choices: game.pegChoices)
-                .frame(maxHeight: size == .compact ? 40 : 56)
+                .frame(maxHeight: size == .compact ? 32 : 48)
             
             if size == .large {
                 Text("^[\(game.attempts.count) attempt](inflect: true)")
