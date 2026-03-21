@@ -123,7 +123,7 @@ struct GameList: View {
     
     var addButton: some View {
         Button("Add Game", systemImage: "plus") {
-            gameToEdit = CodeBreaker(name: "Untitled", pegChoices: ["red", "blue"])
+            gameToEdit = CodeBreaker(name: "", pegChoices: ["red", "blue"], codeLength: 4)
         }
         .sheet(isPresented: showGameEditor) {
             gameEditor
@@ -133,7 +133,7 @@ struct GameList: View {
     @ViewBuilder
     var gameEditor: some View {
         if let gameToEdit {
-            let copyOfGameToEdit = CodeBreaker(name: gameToEdit.name, pegChoices: gameToEdit.pegChoices)
+            let copyOfGameToEdit = CodeBreaker(name: gameToEdit.name, pegChoices: gameToEdit.pegChoices, codeLength: gameToEdit.codeLength)
             GameEditor(game: copyOfGameToEdit) {
                 if games.contains(gameToEdit) {
                     modelContext.delete(gameToEdit)
@@ -166,19 +166,19 @@ struct GameList: View {
     func addSampleGames() async {
         let fetchDescriptor = FetchDescriptor<CodeBreaker>()
         if let results = try? modelContext.fetchCount(fetchDescriptor), results == 0 {
-//                modelContext.insert(CodeBreaker(name: "RGB", pegChoices: ["red", "green", "blue"]))
-//                modelContext.insert(CodeBreaker(name: "Mastermind", pegChoices: ["blue", "red", "yellow", "green", "cyan", "purple"]))
-//                modelContext.insert(CodeBreaker(name: "Pastel", pegChoices: ["cyan", "mint", "pink", "purple"]))
-            for url in sampleGamesURLS {
-                do {
-                    let (json, _) = try await URLSession.shared.data(from: url)
-                    let game = try JSONDecoder().decode(CodeBreaker.self, from: json)
-                    modelContext.insert(game)
-                    print("Loaded sample games from \(url)")
-                } catch {
-                    print("Couldn't load a sample game: \(error.localizedDescription)")
-                }
-            }
+                modelContext.insert(CodeBreaker(name: "RGB", pegChoices: ["red", "green", "blue"], codeLength: 4))
+                modelContext.insert(CodeBreaker(name: "Mastermind", pegChoices: ["blue", "red", "yellow", "green", "cyan", "purple"], codeLength: 6))
+                modelContext.insert(CodeBreaker(name: "Pastel", pegChoices: ["cyan", "mint", "pink", "purple"], codeLength: 8))
+//            for url in sampleGamesURLS {
+//                do {
+//                    let (json, _) = try await URLSession.shared.data(from: url)
+//                    let game = try JSONDecoder().decode(CodeBreaker.self, from: json)
+//                    modelContext.insert(game)
+//                    print("Loaded sample games from \(url)")
+//                } catch {
+//                    print("Couldn't load a sample game: \(error.localizedDescription)")
+//                }
+//            }
         }
     }
     

@@ -77,7 +77,6 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                 }
             }
         }
-        .padding(.horizontal)
     }
     
     func matchMarker(match: Match) -> some View {

@@ -32,10 +32,12 @@ struct CodeBreakerView: View {
             ZStack(alignment: .bottom) {
                 ScrollView(showsIndicators: false) {
                     CodeView(code: game.masterCode)
+                        .padding(.horizontal)
                         .sensoryFeedback(.success, trigger: doneButton)
                     
                     if !game.isOver {
                         CodeView(code: game.guess, selection: $selection)
+                            .padding(.horizontal)
                             .animation(nil, value: game.attempts.count)
                             .opacity(restarting ? 0 : 1)
                     }
@@ -43,6 +45,7 @@ struct CodeBreakerView: View {
                     ForEach(game.attempts, id: \.pegs) { attempt in
                         if let matches = attempt.matches {
                             CodeView(code: attempt, matches: matches)
+                                .padding(.horizontal)
                                 .transition(.attempt(game.isOver))
                         }
                     }
@@ -181,7 +184,7 @@ struct CodeBreakerView: View {
 }
 
 #Preview(traits: .swiftData) {
-    @Previewable @State var game = CodeBreaker(name: "", pegChoices: ["blue", "red", "yellow", "green"])
+    @Previewable @State var game = CodeBreaker(name: "", pegChoices: ["blue", "red", "yellow", "green"], codeLength: 6)
     
     NavigationView {
         CodeBreakerView(game: game)

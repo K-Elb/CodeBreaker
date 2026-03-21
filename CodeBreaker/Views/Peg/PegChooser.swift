@@ -13,11 +13,18 @@ struct PegChooser: View {
     
     // MARK: Data Out
     var onChoose: ((Peg.RawValue) -> Void)?
+    var columns: [GridItem] {
+        if choices.count < 4 {
+            return Array(repeating: GridItem(.flexible(minimum: 48, maximum: 96)), count: choices.count)
+        } else {
+            return Array(repeating: GridItem(.flexible(minimum: 48, maximum: 96)), count: 4)
+        }
+    }
     
     // MARK: - Body
     
     var body: some View {
-        LazyVGrid(columns: [GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48)),GridItem(.flexible(minimum: 48))]) {
+        LazyVGrid(columns: columns) {
             ForEach(choices.indices, id: \.self) { i in
                     Button {
                         onChoose?(choices[i])
@@ -26,7 +33,6 @@ struct PegChooser: View {
                     }
             }
         }
-//        .aspectRatio(CGFloat(choices.count), contentMode: .fit)
     }
 }
 

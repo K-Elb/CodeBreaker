@@ -31,29 +31,40 @@ struct GameEditor: View {
                             done()
                         }
                 }
+
+                Section("Code") {
+                    Picker("Length", selection: $game.codeLength) {
+                        ForEach(4..<9) { id in
+                            Text("\(id)").tag(id)
+                        }
+                    }
+                    
+                    CodeView(code: Code(kind: .master(isHidden: true), pegs: Array(repeating: "clear", count: game.codeLength)))
+                }
+                
                 Section("Pegs") {
                     PegChoicesChooser(pegChoices: $game.pegChoices)
                 }
             }
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") {
-                            dismiss()
-                        }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Done") {
-                            done()
-                        }
-                        .alert("Invalid Game", isPresented: $showInvalidGameAlert) {
-                            Button("OK") {
-                                showInvalidGameAlert = false
-                            }
-                        } message: {
-                            Text("A game must have a name and more than one unique peg.")
-                        }
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
                     }
                 }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        done()
+                    }
+                    .alert("Invalid Game", isPresented: $showInvalidGameAlert) {
+                        Button("OK") {
+                            showInvalidGameAlert = false
+                        }
+                    } message: {
+                        Text("A game must have a name and more than one unique peg.")
+                    }
+                }
+            }
         }
     }
     
@@ -74,7 +85,7 @@ extension CodeBreaker {
 }
 
 #Preview(traits: .swiftData) {
-    @Previewable var game = CodeBreaker(name: "Preview", pegChoices: ["orange", "purple"])
+    @Previewable var game = CodeBreaker(name: "Preview", pegChoices: ["orange", "purple"], codeLength: 4)
     GameEditor(game: game) {
         print("game name changed to \(game.name)")
         print("game pegs changed to \(game.pegChoices)")

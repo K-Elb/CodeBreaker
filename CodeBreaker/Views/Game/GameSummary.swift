@@ -33,10 +33,10 @@ struct GameSummary: View {
         let layout = size == .compact ? AnyLayout(HStackLayout()) :  AnyLayout(VStackLayout(alignment: .leading))
         layout {
             Text(game.name)
-                .font(.title2)
+                .font(.title2.bold())
             
             PegChooser(choices: game.pegChoices)
-                .frame(maxHeight: size == .compact ? 32 : 48)
+//                .frame(maxHeight: size == .compact ? 32 : 48)
             
             if size == .large {
                 Text("^[\(game.attempts.count) attempt](inflect: true)")
@@ -47,6 +47,6 @@ struct GameSummary: View {
 
 #Preview(traits: .swiftData) {
     List {
-        GameSummary(game: CodeBreaker(name: "Test Game", pegChoices: ["red", "blue", "green", "yellow"]))
+        GameSummary(game: CodeBreaker(name: "Test Game", pegChoices: ["red", "blue", "green", "yellow"], codeLength: 4))
     }
 }

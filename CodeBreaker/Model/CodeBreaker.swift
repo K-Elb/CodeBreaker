@@ -24,7 +24,7 @@ final class CodeBreaker {
     
     init() { }
     
-    init(name: String = "Code Breaker", pegChoices : [Peg.RawValue], codeLength: Int = 4) {
+    init(name: String = "Code Breaker", pegChoices : [Peg.RawValue], codeLength: Int) {
         self.name = name
         self.pegChoices = pegChoices
         self.codeLength = codeLength

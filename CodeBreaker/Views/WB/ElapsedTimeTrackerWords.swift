@@ -41,7 +41,7 @@ struct ElapsedTimeTrackerWords: ViewModifier {
             }
             .onReceive(modelContentWillSavePublisher) { _ in
                 game.updateElapsedTime()
-                print("Updated elapsed time to \(game.elapsedTime)")
+                print("Updated words elapsed time to \(game.elapsedTime)")
             }
     }
 }
