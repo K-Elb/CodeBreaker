@@ -27,8 +27,8 @@ extension CodeBreaker: Codable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.name = try container.decode(String.self, forKey: .name)
-        self.masterCode = try container.decode(Code.self, forKey: .masterCode)
-        self.guess = try container.decode(Code.self, forKey: .guess)
+        self.masterCode = try container.decodeIfPresent(Code.self, forKey: .masterCode)
+        self.guess = try container.decodeIfPresent(Code.self, forKey: .guess)
         self._attempts = try container.decode([Code].self, forKey: ._attempts)
         self.pegChoices = try container.decode([Peg.RawValue].self, forKey: .pegChoices)
         self.startTime = try container.decodeIfPresent(Date.self, forKey: .startTime)
@@ -42,8 +42,8 @@ extension CodeBreaker: Codable {
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(name, forKey: .name)
-        try container.encode(masterCode, forKey: .masterCode)
-        try container.encode(guess, forKey: .guess)
+        try container.encodeIfPresent(masterCode, forKey: .masterCode)
+        try container.encodeIfPresent(guess, forKey: .guess)
         try container.encode(_attempts, forKey: ._attempts)
         try container.encode(pegChoices, forKey: .pegChoices)
         try container.encodeIfPresent(startTime, forKey: .startTime)

@@ -11,8 +11,8 @@ import SwiftData
 @Model
 final class CodeBreaker {
     var name: String = ""
-    @Relationship(deleteRule: .cascade) var masterCode: Code = Code(kind: .master(isHidden: true), pegs: [])
-    @Relationship(deleteRule: .cascade) var guess: Code = Code(kind: .guess, pegs: [])
+    @Relationship(deleteRule: .cascade) var masterCode: Code?
+    @Relationship(deleteRule: .cascade) var guess: Code?
     @Relationship(deleteRule: .cascade, inverse: \Code.game) var _attempts: [Code] = []
     var pegChoices: [Peg.RawValue] = []
     @Transient var startTime: Date? // doesn't change UI
@@ -30,7 +30,7 @@ final class CodeBreaker {
         self.codeLength = codeLength
         masterCode = Code(kind: .master(isHidden: true), pegs: Array(repeating: Code.missingPeg, count: codeLength))
         guess = Code(kind: .guess, pegs: Array(repeating: Code.missingPeg, count: codeLength))
-        masterCode.randomise(from: pegChoices)
+        masterCode?.randomise(from: pegChoices)
     }
     
     var attempts: [Code] {
@@ -59,9 +59,9 @@ final class CodeBreaker {
     }
     
     func restart() {
-        masterCode.kind = .master(isHidden: true)
-        masterCode.randomise(from: pegChoices)
-        guess.reset(length: codeLength)
+        masterCode?.kind = .master(isHidden: true)
+        masterCode?.randomise(from: pegChoices)
+        guess?.reset(length: codeLength)
         attempts.removeAll()
         startTime = .now
         endTime = nil
@@ -70,6 +70,7 @@ final class CodeBreaker {
     }
     
     func validAttempt() -> Bool {
+        guard let guess else { return false }
         guard !attempts.contains(where: { $0.pegs == guess.pegs }) else { return false }
         guard guess.pegs != Array(repeating: Code.missingPeg, count: codeLength) else { return false }
         guard !guess.pegs.contains(where: { $0 == Code.missingPeg }) else { return false }
@@ -77,6 +78,7 @@ final class CodeBreaker {
     }
     
     func attemptGuess() {
+        guard let guess, let masterCode else { return }
         let attempt = Code(kind: .attempt(guess.match(against: masterCode)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         lastAttemptDate = Date.now
@@ -90,7 +92,7 @@ final class CodeBreaker {
     }
     
     func setGuessPeg(_ peg: Peg.RawValue, at index: Int) {
-        guard guess.pegs.indices.contains(index) else { return }
+        guard let guess, guess.pegs.indices.contains(index) else { return }
         guess.pegs[index] = peg
     }
 }

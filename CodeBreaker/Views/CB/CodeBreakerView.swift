@@ -31,12 +31,14 @@ struct CodeBreakerView: View {
         VStack {
             ZStack(alignment: .bottom) {
                 ScrollView(showsIndicators: false) {
-                    CodeView(code: game.masterCode)
-                        .padding(.horizontal)
-                        .sensoryFeedback(.success, trigger: doneButton)
+                    if let masterCode = game.masterCode {
+                        CodeView(code: masterCode)
+                                                .padding(.horizontal)
+                                                .sensoryFeedback(.success, trigger: doneButton)
+                    }
                     
-                    if !game.isOver {
-                        CodeView(code: game.guess, selection: $selection)
+                    if !game.isOver, let guess = game.guess {
+                        CodeView(code: guess, selection: $selection)
                             .padding(.horizontal)
                             .animation(nil, value: game.attempts.count)
                             .opacity(restarting ? 0 : 1)
@@ -115,16 +117,15 @@ struct CodeBreakerView: View {
     var pegChoosingDial: some Gesture {
         RotationGesture()
             .onChanged { value in
-                let pegChoicesIndex = Int(abs(value.degrees)/90) %  game.pegChoices.count
-                game.guess.pegs[selection] = game.pegChoices[pegChoicesIndex]
+                let pegChoicesIndex = Int(abs(value.degrees)/90) % game.pegChoices.count
+                game.guess?.pegs[selection] = game.pegChoices[pegChoicesIndex]
             }
-        
     }
     
     func changePegAtSelection(to peg: Peg.RawValue) {
         pegButton.toggle()
         game.setGuessPeg(peg, at: selection)
-        selection = (selection + 1) % game.masterCode.pegs.count
+        selection = (selection + 1) % (game.masterCode?.pegs.count ?? 1)
     }
     
     func restart() {
@@ -161,7 +162,7 @@ struct CodeBreakerView: View {
     
     func clear() {
         withAnimation {
-            game.guess.reset(length: game.codeLength)
+            game.guess?.reset(length: game.codeLength)
             selection = 0
         }
     }
