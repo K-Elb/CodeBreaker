@@ -57,16 +57,8 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
                     Group {
                         if selection == index, code.kind == .guess {
                             Selection.shape
-                                .glassEffect(.clear, in: Selection.shape)
-                                .padding(6)
+                                .stroke(lineWidth: 2)
                                 .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
-                                .overlay {
-                                    if let peg = Peg(rawValue: code.pegs[index]), peg != .clear {
-                                        Image(systemName: peg.symbol)
-                                            .flexibleSystemFont()
-                                            .foregroundStyle(.wb)
-                                    }
-                                }
                         }
                     }
                     .animation(.selection, value: selection)

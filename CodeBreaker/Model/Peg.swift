@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum Peg: String, Identifiable, CaseIterable {
-    case clear, red, blue, green, cyan, orange, yellow, mint, pink, purple, brown, indigo, teal
+    case red, blue, green, cyan, orange, yellow, mint, pink, purple, brown, indigo, teal, clear
     var id: Self { self }
     
     var color: Color {

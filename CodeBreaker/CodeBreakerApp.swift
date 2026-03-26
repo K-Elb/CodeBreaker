@@ -12,11 +12,14 @@ import SwiftData
 struct CodeBreakerApp: App {
     var body: some Scene {
         WindowGroup {
-            GeometryReader { geometry in
-                GameChooser()
-                    .modelContainer(for: CodeBreaker.self)
-                    .environment(\.sceneFrame, geometry.frame(in: .global))
-            }
+            GameSelector()
+                .modelContainer(for: CodeBreaker.self)
+
+//            GeometryReader { geometry in
+//                GameChooser()
+//                    .modelContainer(for: CodeBreaker.self)
+//                    .environment(\.sceneFrame, geometry.frame(in: .global))
+//            }
         }
     }
 }

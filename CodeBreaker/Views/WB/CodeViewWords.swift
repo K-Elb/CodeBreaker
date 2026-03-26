@@ -41,17 +41,6 @@ struct CodeViewWords: View {
             ForEach(code.pegs.indices , id: \.self) { index in
                 ZStack(alignment: .topTrailing) {
                     PegView(peg: code.pegs[index])
-                        .padding(Selection.border)
-                        .background {
-                            Group {
-                                if selection == index, code.kind == .guess {
-                                    Selection.shape
-                                        .fill(Selection.color)
-                                        .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
-                                }
-                            }
-                            .animation(.selection, value: selection)
-                        }
                         .overlay {
                             Selection.shape
                                 .foregroundStyle(code.isHidden ? Color.gray : .clear)
@@ -67,6 +56,16 @@ struct CodeViewWords: View {
                                 isFocused.toggle()
                             }
                         }
+                    
+                    Group {
+                        if selection == index, code.kind == .guess {
+                            Selection.shape
+                                .stroke(lineWidth: 2)
+                                .padding(Selection.border)
+                                .matchedGeometryEffect(id: "selection", in: selectionNameSpace)
+                        }
+                    }
+                    .animation(.selection, value: selection)
                     
                     if showMarkers, !matches.isEmpty {
                         matchMarker(match: matches[index])
@@ -87,9 +86,9 @@ struct CodeViewWords: View {
 }
 
 fileprivate struct Selection {
-    static let border: CGFloat = 0
+    static let border: CGFloat = 1
     static let color: Color = Color.gray(0.8)
-    static let shape = RoundedRectangle(cornerRadius: 16)
+    static let shape = RoundedRectangle(cornerRadius: 12)
 }
 
 #Preview {
