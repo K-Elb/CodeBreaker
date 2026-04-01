@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct WordBreakerView: View {
-    // MARK: Data In
-    @Environment(\.words) var words
+//    // MARK: Data In
+//    @Environment(\.words) var words
     
     // MARK: Data Shared with Me
     var game: WordBreaker
@@ -67,14 +67,14 @@ struct WordBreakerView: View {
             .navigationTitle(game.name)
             .navigationBarTitleDisplayMode(.inline)
             .padding(.horizontal)
-            .onChange(of: words.count) {
-                randomWord()
-            }
+//            .onChange(of: game) {
+//                randomWord()
+//            }
             .trackElapsedTime(in: game)
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Restart", systemImage: "arrow.circlepath", action: restart)
-                }
+//                ToolbarItem(placement: .primaryAction) {
+//                    Button("Restart", systemImage: "arrow.circlepath", action: restart)
+//                }
                 
                 ToolbarItem {
                     ElapsedTime(startTime: game.startTime, endTime: game.endTime, elapsedTime: game.elapsedTime)
@@ -100,28 +100,28 @@ struct WordBreakerView: View {
         word = ""
     }
     
-    func randomWord() {
-        if let masterword = words.random(length: game.codeLength) {
-            game.masterWord = Code(kind: .master(isHidden: true), pegs: [])
-            for char in masterword {
-                game.masterWord.pegs.append("\(char)")
-            }
-            print(game.masterWord.pegs)
-        }
-    }
+//    func randomWord() {
+//        if let masterword = words.random(length: game.codeLength) {
+//            game.masterWord = Code(kind: .master(isHidden: true), pegs: [])
+//            for char in masterword {
+//                game.masterWord.pegs.append("\(char)")
+//            }
+//            print(game.masterWord.pegs)
+//        }
+//    }
     
-    func restart() {
-        withAnimation(.restart) {
-            randomWord()
-            restarting = game.isOver
-            game.restart()
-            selection = 0
-        } completion: {
-            withAnimation(.restart) {
-                restarting = false
-            }
-        }
-    }
+//    func restart() {
+//        withAnimation(.restart) {
+//            randomWord()
+//            restarting = game.isOver
+//            game.restart()
+//            selection = 0
+//        } completion: {
+//            withAnimation(.restart) {
+//                restarting = false
+//            }
+//        }
+//    }
     
     func guess() {
         withAnimation(.guess) {

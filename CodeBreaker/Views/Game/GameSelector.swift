@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct GameSelector: View {
+    @Environment(\.words) var words
     @State private var type: String = "Colors"
     @State private var length: Int = 4
     
@@ -27,7 +28,7 @@ struct GameSelector: View {
                     case "Colors":
                         CodeBreakerView(game: CodeBreaker(name: "Colors", pegChoices: ["red", "blue", "green", "cyan"], codeLength: length))
                     case "Words":
-                        WordBreakerView(game: WordBreaker(codeLength: length))
+                        WordBreakerView(game: WordBreaker(codeLength: length, word: words.random(length: length) ?? ""))
                     default:
                         Text("Game not available")
                     }
@@ -70,7 +71,7 @@ struct CodeLengthPicker: View {
     
     func block(_ int: Int) -> some View {
         RoundedRectangle(cornerRadius: 16)
-            .foregroundStyle(length == int ? .accent : .gray(0.95))
+            .foregroundStyle(length == int ? AnyShapeStyle(Color.accent) : AnyShapeStyle(Material.ultraThinMaterial))
             .aspectRatio(2, contentMode: .fit)
             .overlay {
                 Text("\(int)")
@@ -101,7 +102,7 @@ struct CodeTypePicker: View {
     
     func block(_ int: String) -> some View {
         RoundedRectangle(cornerRadius: 16)
-            .foregroundStyle(type == int ? .accent : .gray(0.95))
+            .foregroundStyle(type == int ? AnyShapeStyle(Color.accent) : AnyShapeStyle(Material.ultraThinMaterial))
             .aspectRatio(2, contentMode: .fit)
             .overlay {
                 Text("\(int)")
@@ -142,7 +143,7 @@ struct GameStat: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .bottom])
         .padding(.top, 32)
-        .background(Color.gray(0.95), in: RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
     
     func blockTotal(value: String, title: String) -> some View {
@@ -163,7 +164,7 @@ struct GameStat: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(Color.gray(0.95), in: RoundedRectangle(cornerRadius: 16))
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
     }
     
     func pegShape(_ peg: Peg) -> some View {

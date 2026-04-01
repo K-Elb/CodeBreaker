@@ -25,15 +25,26 @@ class WordBreaker: Equatable {
         set { _attempts = newValue }
     }
     
-    init(codeLength: Int = 5) {
+    init(codeLength: Int = 5, word: String = "") {
         self.codeLength = codeLength
         self.masterWord = Code(kind: .master(isHidden: true), pegs: Array(repeating: "", count: codeLength))
         self.guess = Code(kind: .guess, pegs: Array(repeating: "", count: codeLength))
-        guess.reset(length: codeLength)
+//        guess.reset(length: codeLength)
+        randomWord(word: word)
     }
     
     static func == (lhs: WordBreaker, rhs: WordBreaker) -> Bool {
         lhs.name == rhs.name
+    }
+    
+    func randomWord(word: String) {
+//        if let masterword = words.random(length: codeLength) {
+            masterWord = Code(kind: .master(isHidden: true), pegs: [])
+            for char in word {
+                masterWord.pegs.append("\(char)")
+            }
+            print(masterWord.pegs)
+//        }
     }
     
     func restart() {
