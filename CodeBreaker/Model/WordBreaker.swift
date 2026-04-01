@@ -10,8 +10,9 @@ import Foundation
 @Observable
 class WordBreaker: Equatable {
     var name: String = "Word Breaker"
-    var masterWord: Code = Code(kind: .master(isHidden: true), pegs: Array(repeating: "", count: 5))
-    var guess: Code = Code(kind: .guess, pegs: Array(repeating: "", count: 5))
+    var codeLength: Int
+    var masterWord: Code
+    var guess: Code
     var _attempts: [Code] = []
     var startTime: Date?
     var endTime: Date?
@@ -24,12 +25,19 @@ class WordBreaker: Equatable {
         set { _attempts = newValue }
     }
     
+    init(codeLength: Int = 5) {
+        self.codeLength = codeLength
+        self.masterWord = Code(kind: .master(isHidden: true), pegs: Array(repeating: "", count: codeLength))
+        self.guess = Code(kind: .guess, pegs: Array(repeating: "", count: codeLength))
+        guess.reset(length: codeLength)
+    }
+    
     static func == (lhs: WordBreaker, rhs: WordBreaker) -> Bool {
         lhs.name == rhs.name
     }
     
     func restart() {
-        guess.reset(length: 5)
+        guess.reset(length: codeLength)
         attempts.removeAll()
         startTime = .now
         endTime = nil
@@ -42,7 +50,7 @@ class WordBreaker: Equatable {
         let attempt = Code(kind: .attempt(guess.match(against: masterWord)), pegs: guess.pegs)
         attempts.insert(attempt, at: 0)
         lastAttemptDate = Date.now
-        guess.reset(length: 5)
+        guess.reset(length: codeLength)
         if attempts.first?.pegs == masterWord.pegs {
             isOver = true
             masterWord.kind = .master(isHidden: false)

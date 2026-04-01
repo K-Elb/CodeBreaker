@@ -74,10 +74,6 @@ struct GameList: View {
 //            .onMove { offsets, destination in
 //                games.move(fromOffsets: offsets, toOffset: destination)
 //            }
-            
-            NavigationLink(destination: WordBreakerView()) {
-                Label("Word Breaker", systemImage: "flame")
-            }
         }
         .gesture(summarySizeMagnifier)
         .onChange(of: games) {

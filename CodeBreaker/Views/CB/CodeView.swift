@@ -77,7 +77,7 @@ struct CodeView<AncillaryView>: View where AncillaryView: View {
             .strokeBorder(match != .nomatch ? Color.primary : Color.clear, lineWidth: 2)
             .aspectRatio(1, contentMode: .fit)
             .frame(maxWidth: 16)
-            .padding(6)
+            .padding(4)
     }
 }
 

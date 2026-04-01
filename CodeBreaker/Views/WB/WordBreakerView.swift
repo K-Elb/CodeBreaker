@@ -12,15 +12,13 @@ struct WordBreakerView: View {
     @Environment(\.words) var words
     
     // MARK: Data Shared with Me
-    @State private var game = WordBreaker()
+    var game: WordBreaker
     
     // MARK: Data Owned by Me
     @State private var word: String = ""
     @State private var selection: Int = 0
     @State private var restarting = false
     @State private var hideMostRecentMarkers = false
-    @State private var length: Int = 5
-    
     @State private var focus: Bool = false
     @FocusState private var isFocused: Bool
     
@@ -103,7 +101,7 @@ struct WordBreakerView: View {
     }
     
     func randomWord() {
-        if let masterword = words.random(length: length) {
+        if let masterword = words.random(length: game.codeLength) {
             game.masterWord = Code(kind: .master(isHidden: true), pegs: [])
             for char in masterword {
                 game.masterWord.pegs.append("\(char)")
@@ -139,8 +137,8 @@ struct WordBreakerView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        WordBreakerView()
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        WordBreakerView(game: WordBreaker(codeLength: 3))
+//    }
+//}

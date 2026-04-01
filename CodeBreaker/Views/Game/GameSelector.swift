@@ -8,27 +8,28 @@
 import SwiftUI
 
 struct GameSelector: View {
-    @State private var game: CodeBreaker = CodeBreaker(name: "Colors", pegChoices: ["red", "blue", "green", "cyan"], codeLength: 4)
+    @State private var type: String = "Colors"
+    @State private var length: Int = 4
     
     var body: some View {
         NavigationStack {
             VStack {
-                GameStat(game: game)
+                GameStat(type: type, length: length)
                 
-                CodeTypePicker(game: game)
+                CodeTypePicker(type: $type)
                 
-                CodeLengthPicker(game: $game)
+                CodeLengthPicker(length: $length)
                 
                 Spacer()
                 
                 NavigationLink{
-                    switch game.name {
+                    switch type {
                     case "Colors":
-                        CodeBreakerView(game: game)
+                        CodeBreakerView(game: CodeBreaker(name: "Colors", pegChoices: ["red", "blue", "green", "cyan"], codeLength: length))
                     case "Words":
-                        WordBreakerView()
+                        WordBreakerView(game: WordBreaker(codeLength: length))
                     default:
-                        Text("")
+                        Text("Game not available")
                     }
                 } label: {
                     Label("Start", systemImage: "play.fill")
@@ -50,7 +51,7 @@ struct GameSelector: View {
 }
 
 struct CodeLengthPicker: View {
-    @Binding var game: CodeBreaker
+    @Binding var length: Int
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -59,7 +60,7 @@ struct CodeLengthPicker: View {
             
             HStack {
                 ForEach(4..<7) { i in
-                    Button(action: {button(i)}) {
+                    Button(action: {length = i}) {
                         block(i)
                     }
                 }
@@ -69,24 +70,18 @@ struct CodeLengthPicker: View {
     
     func block(_ int: Int) -> some View {
         RoundedRectangle(cornerRadius: 16)
-            .foregroundStyle(game.codeLength == int ? .accent : .clear)
+            .foregroundStyle(length == int ? .accent : .gray(0.95))
             .aspectRatio(2, contentMode: .fit)
             .overlay {
                 Text("\(int)")
                     .font(.title2.bold())
-                    .foregroundStyle(game.codeLength == int ? .wb : .accent)
+                    .foregroundStyle(length == int ? .wb : .accent)
             }
-    }
-    
-    func button(_ i: Int) {
-        let somepegs = Array(Peg.allCases.prefix(i))
-        let pegs = somepegs.map{ $0.rawValue }
-        game = CodeBreaker(name:game.name ,pegChoices: pegs, codeLength: i)
     }
 }
 
 struct CodeTypePicker: View {
-    var game: CodeBreaker
+    @Binding var type: String
     @State private var types: [String] = ["Colors", "Words"]
     
     var body: some View {
@@ -95,9 +90,9 @@ struct CodeTypePicker: View {
                 .foregroundStyle(Color.secondary)
             
             HStack {
-                ForEach(types, id: \.self) { type in
-                    Button(action: {game.name = type}) {
-                        block(type)
+                ForEach(types, id: \.self) { t in
+                    Button(action: {type = t}) {
+                        block(t)
                     }
                 }
             }
@@ -106,21 +101,19 @@ struct CodeTypePicker: View {
     
     func block(_ int: String) -> some View {
         RoundedRectangle(cornerRadius: 16)
-            .foregroundStyle(game.name == int ? .accent : .clear)
+            .foregroundStyle(type == int ? .accent : .gray(0.95))
             .aspectRatio(2, contentMode: .fit)
             .overlay {
                 Text("\(int)")
                     .font(.title2.bold())
-                    .foregroundStyle(game.name == int ? .wb : .accent)
+                    .foregroundStyle(type == int ? .wb : .accent)
             }
     }
 }
 
 struct GameStat: View {
-    var game: CodeBreaker
-    var somePegs: [Peg] {
-        Array(Peg.allCases.prefix(game.codeLength))
-    }
+    let type: String
+    let length: Int
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -149,7 +142,7 @@ struct GameStat: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .bottom])
         .padding(.top, 32)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.gray(0.95), in: RoundedRectangle(cornerRadius: 16))
     }
     
     func blockTotal(value: String, title: String) -> some View {
@@ -161,18 +154,19 @@ struct GameStat: View {
                 .foregroundStyle(.secondary)
             
             HStack {
-                ForEach(game.pegChoices, id: \.self) { peg in
-                    pegs(peg)
+                let pegs = Array(Peg.allCases.prefix(length))
+                ForEach(pegs, id: \.self) { peg in
+                    pegShape(peg)
                 }
             }
             .frame(height: 56)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.gray(0.95), in: RoundedRectangle(cornerRadius: 16))
     }
     
-    func pegs(_ peg: String) -> some View {
-        PegView(peg: peg)
+    func pegShape(_ peg: Peg) -> some View {
+        PegView(peg: peg.rawValue)
     }
 }
